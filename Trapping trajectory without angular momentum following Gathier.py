@@ -31,9 +31,22 @@ sig_s = 1100 #density of sphere in kg/m^3
 sig_0 = 1000 #density of medium in kg/m^3
 n_s = 1.5468
 n_0 = 1.333
-g = 9.8 #gravitational acceleration
+g = 9.81 #gravitational acceleration
 c = 3 * 10**8
 m = 4/3 * np.pi * Rs**3 * (sig_s - sig_0)
+
+def r_s(theta, theta2):
+    return (n_0*np.cos(theta) - n_s*np.cos(theta2))/(n_0*np.cos(theta) + n_s*np.cos(theta2))
+
+def r_p(theta, theta2):
+    return (n_0 * np.cos(theta2) - n_s * np.cos(theta))/ (n_s * np.cos(theta) + n_0 * np.cos(theta2))
+
+def rfcoe_sm(theta,theta2):
+    return ((r_s(theta,theta2) + r_p(theta,theta2))/2)**2
+
+def rfcoe(theta, theta2):
+    return (n_0 * n_s)**2 * ((np.cos(theta))**2 - (np.cos(theta2))**2)**2/ \
+    (n_0*n_s*((np.cos(theta))**2 + (np.cos(theta2))**2) + (n_0**2 + n_s**2) * np.cos(theta)*np.cos(theta2))**2
 
 
 def I_GB(rou, z):
@@ -56,10 +69,13 @@ def integrand(theta,d):
     
     theta_2 = np.arcsin(n_0*np.sin(theta)/n_s)
     
-    Reflection_coe = (n_0 * n_s)**2 * ((np.cos(theta))**2 - (np.cos(theta_2))**2)**2/ \
-    (n_0*n_s*((np.cos(theta))**2 + (np.cos(theta_2))**2) + (n_0**2 + n_s**2) * np.cos(theta) * np.cos(theta_2))**2
+    Reflection_coe = rfcoe_sm(theta,theta_2)
     
-    return (np.pi/c) * n_0 * (1 + np.cos(2*theta)) * I_LG01(rou,z) * Reflection_coe * Rs**2 * np.sin(2*theta)
+    #Reflection_coe = (n_0 * n_s)**2 * ((np.cos(theta))**2 - (np.cos(theta_2))**2)**2/ \
+    #(n_0*n_s*((np.cos(theta))**2 + (np.cos(theta_2))**2) + (n_0**2 + n_s**2) * np.cos(theta) * np.cos(theta_2))**2
+    
+    return (np.pi/c) * n_0 * (1 + np.cos(2*theta)) * \
+        I_GB(rou, z) * Reflection_coe * Rs**2 * np.sin(2*theta)
 
 def integrand_1tz(theta,d):
     
@@ -69,12 +85,15 @@ def integrand_1tz(theta,d):
     
     theta_2 = np.arcsin(n_0*np.sin(theta)/n_s)
     
-    Reflection_coe = (n_0 * n_s)**2 * ((np.cos(theta))**2 - (np.cos(theta_2))**2)**2/ \
-    (n_0*n_s*((np.cos(theta))**2 + (np.cos(theta_2))**2) + (n_0**2 + n_s**2) * np.cos(theta)*np.cos(theta_2))**2
+    Reflection_coe = rfcoe_sm(theta,theta_2)
+    
+    #Reflection_coe = (n_0 * n_s)**2 * ((np.cos(theta))**2 - (np.cos(theta_2))**2)**2/ \
+    #(n_0*n_s*((np.cos(theta))**2 + (np.cos(theta_2))**2) + (n_0**2 + n_s**2) * np.cos(theta)*np.cos(theta_2))**2
     
     Transmission_coe = 1 - Reflection_coe
     
-    return (np.pi/c) * (n_0 - n_s*np.cos(theta - theta_2)) * I_GB(rou,z) * Transmission_coe *Rs**2 * np.sin(2*theta)
+    return (np.pi/c) * (n_0 - n_s*np.cos(theta - theta_2)) * \
+        I_GB(rou,z) * Transmission_coe *Rs**2 * np.sin(2*theta)
 
 def integrand_2rz(theta,d):
     
@@ -84,12 +103,15 @@ def integrand_2rz(theta,d):
     
     theta_2 = np.arcsin(n_0*np.sin(theta)/n_s)
     
-    Reflection_coe = (n_0 * n_s)**2 * ((np.cos(theta))**2 - (np.cos(theta_2))**2)**2/ \
-    (n_0*n_s*((np.cos(theta))**2 + (np.cos(theta_2))**2) + (n_0**2 + n_s**2) * np.cos(theta)*np.cos(theta_2))**2
+    Reflection_coe = rfcoe_sm(theta,theta_2)
+    
+    #Reflection_coe = (n_0 * n_s)**2 * ((np.cos(theta))**2 - (np.cos(theta_2))**2)**2/ \
+    #(n_0*n_s*((np.cos(theta))**2 + (np.cos(theta_2))**2) + (n_0**2 + n_s**2) * np.cos(theta)*np.cos(theta_2))**2
     
     Transmission_coe = 1 - Reflection_coe
     
-    return (np.pi/c) * n_s * (np.cos(theta - theta_2) + np.cos(3*theta_2 - theta)) * I_GB(rou,z) * Reflection_coe * Transmission_coe * Rs**2 * np.sin(2*theta)
+    return (np.pi/c) * n_s * (np.cos(theta - theta_2) + np.cos(3*theta_2 - theta)) * \
+        I_GB(rou,z) * Reflection_coe * Transmission_coe * Rs**2 * np.sin(2*theta)
 
 def integrand_2tz(theta,d):
     
@@ -99,15 +121,18 @@ def integrand_2tz(theta,d):
     
     theta_2 = np.arcsin(n_0*np.sin(theta)/n_s)
     
-    Reflection_coe = (n_0 * n_s)**2 * ((np.cos(theta))**2 - (np.cos(theta_2))**2)**2/ \
-    (n_0*n_s*((np.cos(theta))**2 + (np.cos(theta_2))**2) + (n_0**2 + n_s**2) * np.cos(theta)*np.cos(theta_2))**2
+    Reflection_coe = rfcoe_sm(theta,theta_2)
+    
+    #Reflection_coe = (n_0 * n_s)**2 * ((np.cos(theta))**2 - (np.cos(theta_2))**2)**2/ \
+    #(n_0*n_s*((np.cos(theta))**2 + (np.cos(theta_2))**2) + (n_0**2 + n_s**2) * np.cos(theta)*np.cos(theta_2))**2
     
     Transmission_coe = 1 - Reflection_coe
     
-    return (np.pi/c) * (n_s * np.cos(theta - theta_2) - n_0 * np.cos(2*(theta - theta_2)))* I_GB(rou,z) * Transmission_coe * Transmission_coe * Rs**2 * np.sin(2*theta)
+    return (np.pi/c) * (n_s * np.cos(theta - theta_2) - n_0 * np.cos(2*(theta - theta_2)))* \
+    I_GB(rou,z) * Transmission_coe * Transmission_coe * Rs**2 * np.sin(2*theta)
 
 
-'''
+
 d = np.linspace(0, 835 * 10**(-6), 835) 
 forcenet = []
 for d_e in d:
@@ -123,10 +148,10 @@ for d_e in d:
 print (forcenet)
 
 
-plt.plot(d,forcenet, ls="-.", lw=2, c="c", label="plot figure")
+plt.plot(d * 10**6,forcenet, ls="-.", lw=2, c="c", label="plot figure")
 #plt.axhline(forcenet = 0.0, c="r", ls="--", lw=2)
 #plt.axvline(d = 4.0, c="r", ls="--", lw=2)
-'''
+
 
 
 '''
@@ -152,7 +177,7 @@ def target_displacment(y, t, b):
     return dydt
 '''
 
-
+'''
 y0 = [0.0, 0.0] #initial displacement d0 and velocity vz0
 
 t = np.linspace(0, 10, 101)
@@ -177,7 +202,7 @@ plt.legend(loc='best')
 plt.xlabel('t')
 plt.grid()
 plt.show()
-
+'''
 
 
 
@@ -262,6 +287,8 @@ print (forcenet_r)
 
 plt.plot(a,forcenet_r, ls="-.", lw=2, c="c", label="plot figure")
 '''
+
+'''
 #Radial displacement
 r0 = [0.0, 0.0] #initial displacement a0 and velocity vr0
 
@@ -286,5 +313,21 @@ for i in t:
 plt.xlabel('t')
 plt.grid()
 plt.show()
+'''
 
+#plot trajectory
 #plt.plot(a_list, d_list)
+
+
+def r_s(theta, theta2):
+    return (n_0*np.cos(theta) - n_s*np.cos(theta2))/(n_0*np.cos(theta) + n_s*np.cos(theta2))
+
+def r_p(theta, theta2):
+    return (n_s/np.cos(theta2) - n_0/np.cos(theta)) / (n_0/np.cos(theta) + n_s/np.cos(theta2))
+
+def rfcoe(theta, theta2):
+    return (n_0 * n_s)**2 * ((np.cos(theta))**2 - (np.cos(theta2))**2)**2/ \
+    (n_0*n_s*((np.cos(theta))**2 + (np.cos(theta2))**2) + (n_0**2 + n_s**2) * np.cos(theta)*np.cos(theta2))**2
+    
+print (((r_s(np.pi/3, 0.47186) + r_p(np.pi/3, 0.47186))/2)**2)
+print (rfcoe(np.pi/3, 0.47186))
