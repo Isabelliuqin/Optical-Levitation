@@ -36,32 +36,39 @@ c = 3 * 10**8
 m = 4/3 * np.pi * Rs**3 * (sig_s - sig_0)
 
 def r_s(theta, theta2):
+    '''Fresnel coefficient of s-polarisation'''
     return (n_0*np.cos(theta) - n_s*np.cos(theta2))/(n_0*np.cos(theta) + n_s*np.cos(theta2))
 
 def r_p(theta, theta2):
+    '''Fresnel coefficient of p-polarisation'''
     return (n_0 * np.cos(theta2) - n_s * np.cos(theta))/ (n_s * np.cos(theta) + n_0 * np.cos(theta2))
 
 def rfcoe_sm(theta,theta2):
+    '''Average reflectance'''
     return ((r_s(theta,theta2) + r_p(theta,theta2))/2)**2
 
 def rfcoe(theta, theta2):
+    '''reflectance given in paper'''
     return (n_0 * n_s)**2 * ((np.cos(theta))**2 - (np.cos(theta2))**2)**2/ \
     (n_0*n_s*((np.cos(theta))**2 + (np.cos(theta2))**2) + (n_0**2 + n_s**2) * np.cos(theta)*np.cos(theta2))**2
 
 
 def I_GB(rou, z):
-    
+    '''GB intensity profile'''
     #Gaussian beam propagation parameters
     w = w_0 * np.sqrt(1 + (z/z_R)**2)
     #R = z + z_R**2/z
     return (2 * P/(np.pi * w**2)) * np.exp( - 2 * rou ** 2 / w ** 2)
 
 def I_LG01(rou,z):
+    '''LG01 intensity profile'''
     w = w_0 * np.sqrt(1 + (z/z_R)**2)
     return 2/(np.pi * w**2) * 2 * rou**2/w**2* np.exp(-2*rou**2/w**2)
 
 #Axial Force calculation
 def integrand(theta,d):
+    
+    '''integrand of lower surface reflection'''
     
     rou = Rs * np.sin(theta) #represent rou and z by theta
     
@@ -78,6 +85,8 @@ def integrand(theta,d):
         I_GB(rou, z) * Reflection_coe * Rs**2 * np.sin(2*theta)
 
 def integrand_1tz(theta,d):
+    
+    '''integrand of lower surface transmission'''
     
     rou = Rs * np.sin(theta) #represent rou and z by theta
     
@@ -97,6 +106,8 @@ def integrand_1tz(theta,d):
 
 def integrand_2rz(theta,d):
     
+    '''integrand of upper surface reflection'''
+    
     rou = Rs * np.sin(theta) #represent rou and z by theta
     
     z = d + Rs * (1 - np.cos(theta))
@@ -115,6 +126,8 @@ def integrand_2rz(theta,d):
 
 def integrand_2tz(theta,d):
     
+    '''integrand of upper surface transmission'''
+    
     rou = Rs * np.sin(theta) #represent rou and z by theta
     
     z = d + Rs * (1 - np.cos(theta))
@@ -131,9 +144,9 @@ def integrand_2tz(theta,d):
     return (np.pi/c) * (n_s * np.cos(theta - theta_2) - n_0 * np.cos(2*(theta - theta_2)))* \
     I_GB(rou,z) * Transmission_coe * Transmission_coe * Rs**2 * np.sin(2*theta)
 
-
-
-d = np.linspace(0, 835 * 10**(-6), 835) 
+'''
+#Calculation of axial force integral
+d = np.linspace(0, 835 * 10**(-6), 400) 
 forcenet = []
 for d_e in d:
     F_z = quad(integrand, 0, np.pi/2, args = (d_e)) #returns a tuple with first element the integral result and second element = upper bound error
@@ -146,12 +159,27 @@ for d_e in d:
     forcenet.append(F_znet * 10 ** 12)
 
 print (forcenet)
+'''
+'''
+plt.figure(1)
+plt.plot(d * 10**6,forcenet, lw=2, c="c", label="plot figure")
 
+new_ticks1 = np.linspace(0, 900, 10) # plot axis
+print(new_ticks1)
+plt.xticks(new_ticks1)
+plt.yticks(np.linspace(-2, 5, 8))
+ax = plt.gca()
+ax.spines['top'].set_color('none')
+ax.spines['right'].set_color('none')
+ax.xaxis.set_ticks_position('bottom')
+ax.yaxis.set_ticks_position('left')
+ax.spines['left'].set_position(('data',0))
+ax.spines['bottom'].set_position(('data',0))
 
-plt.plot(d * 10**6,forcenet, ls="-.", lw=2, c="c", label="plot figure")
-#plt.axhline(forcenet = 0.0, c="r", ls="--", lw=2)
-#plt.axvline(d = 4.0, c="r", ls="--", lw=2)
-
+plt.xlabel('d(um)',fontsize=15)
+plt.ylabel('F_axial(pN)',fontsize=15)
+plt.show()
+'''
 
 
 '''
@@ -172,6 +200,7 @@ print (F_znet)
 #Axial displacement
 '''
 def target_displacment(y, t, b):
+    
     d, vz = y
     dydt = [vz, b/m]
     return dydt
@@ -210,18 +239,24 @@ plt.show()
 
 def integrand_1rr(theta,phi,d, a):
     
+    '''integrand of lower surface reflection'''
+    
     rou = np.sqrt(a**2 + Rs**2 * (np.sin(theta))**2 + 2*a*Rs*np.sin(theta) * np.cos(phi)) #represent rou and z by theta
     
     z = d + Rs * (1 - np.cos(theta))
     
     theta_2 = np.arcsin(n_0*np.sin(theta)/n_s)
     
-    Reflection_coe = (n_0 * n_s)**2 * ((np.cos(theta))**2 - (np.cos(theta_2))**2)**2/ \
-    (n_0*n_s*((np.cos(theta))**2 + (np.cos(theta_2))**2) + (n_0**2 + n_s**2) * np.cos(theta) * np.cos(theta_2))**2
+    Reflection_coe = rfcoe_sm(theta,theta_2)
     
-    return - n_0/(2*c) * np.sin(2*theta) * I_GB(rou,z) * Reflection_coe * Rs**2 * np.cos(phi) * np.sin(2*theta)
+    #Reflection_coe = (n_0 * n_s)**2 * ((np.cos(theta))**2 - (np.cos(theta_2))**2)**2/ \
+    #(n_0*n_s*((np.cos(theta))**2 + (np.cos(theta_2))**2) + (n_0**2 + n_s**2) * np.cos(theta) * np.cos(theta_2))**2
+    
+    return (- n_0/(2*c) * np.sin(2*theta) * I_GB(rou,z) * Reflection_coe * Rs**2 * np.cos(phi) * np.sin(2*theta))
 
 def integrand_1tr(theta,phi, d, a):
+    
+    '''integrand of lower surface transmission'''
     
     rou = np.sqrt(a**2 + Rs**2 * (np.sin(theta))**2 + 2*a*Rs*np.sin(theta) * np.cos(phi)) #represent rou and z by theta #represent rou and z by theta
     
@@ -229,8 +264,10 @@ def integrand_1tr(theta,phi, d, a):
     
     theta_2 = np.arcsin(n_0*np.sin(theta)/n_s)
     
-    Reflection_coe = (n_0 * n_s)**2 * ((np.cos(theta))**2 - (np.cos(theta_2))**2)**2/ \
-    (n_0*n_s*((np.cos(theta))**2 + (np.cos(theta_2))**2) + (n_0**2 + n_s**2) * np.cos(theta)*np.cos(theta_2))**2
+    Reflection_coe = rfcoe_sm(theta,theta_2)
+    
+    #Reflection_coe = (n_0 * n_s)**2 * ((np.cos(theta))**2 - (np.cos(theta_2))**2)**2/ \
+    #(n_0*n_s*((np.cos(theta))**2 + (np.cos(theta_2))**2) + (n_0**2 + n_s**2) * np.cos(theta)*np.cos(theta_2))**2
     
     Transmission_coe = 1 - Reflection_coe
     
@@ -238,38 +275,48 @@ def integrand_1tr(theta,phi, d, a):
 
 def integrand_2rr(theta, phi, d, a):
     
+    '''integrand of upper surface reflection'''
+    
     rou = np.sqrt(a**2 + Rs**2 * (np.sin(theta))**2 + 2*a*Rs*np.sin(theta) * np.cos(phi)) #represent rou and z by theta #represent rou and z by theta
     
     z = d + Rs * (1 - np.cos(theta))
     
     theta_2 = np.arcsin(n_0*np.sin(theta)/n_s)
     
-    Reflection_coe = (n_0 * n_s)**2 * ((np.cos(theta))**2 - (np.cos(theta_2))**2)**2/ \
-    (n_0*n_s*((np.cos(theta))**2 + (np.cos(theta_2))**2) + (n_0**2 + n_s**2) * np.cos(theta)*np.cos(theta_2))**2
+    Reflection_coe = rfcoe_sm(theta,theta_2)
+    
+    #Reflection_coe = (n_0 * n_s)**2 * ((np.cos(theta))**2 - (np.cos(theta_2))**2)**2/ \
+    #(n_0*n_s*((np.cos(theta))**2 + (np.cos(theta_2))**2) + (n_0**2 + n_s**2) * np.cos(theta)*np.cos(theta_2))**2
     
     Transmission_coe = 1 - Reflection_coe
     
-    return n_s/(2*c) * (np.sin(3*theta_2 - theta) - np.sin(theta - theta_2)) * I_GB(rou,z) * Reflection_coe * Transmission_coe * Rs**2 * np.cos(phi) * np.sin(2*theta)
+    return n_s/(2*c) * (np.sin(3*theta_2 - theta) - np.sin(theta - theta_2)) * I_GB(rou,z) *\
+        Reflection_coe * Transmission_coe * Rs**2 * np.cos(phi) * np.sin(2*theta)
 
 def integrand_2tr(theta, phi, d, a):
     
+    '''integrand of upper surface transmission'''
+    
     rou = np.sqrt(a**2 + Rs**2 * (np.sin(theta))**2 + 2*a*Rs*np.sin(theta) * np.cos(phi)) #represent rou and z by theta #represent rou and z by theta
     
     z = d + Rs * (1 - np.cos(theta))
     
     theta_2 = np.arcsin(n_0*np.sin(theta)/n_s)
     
-    Reflection_coe = (n_0 * n_s)**2 * ((np.cos(theta))**2 - (np.cos(theta_2))**2)**2/ \
-    (n_0*n_s*((np.cos(theta))**2 + (np.cos(theta_2))**2) + (n_0**2 + n_s**2) * np.cos(theta)*np.cos(theta_2))**2
+    Reflection_coe = rfcoe_sm(theta,theta_2)
+    
+    #Reflection_coe = (n_0 * n_s)**2 * ((np.cos(theta))**2 - (np.cos(theta_2))**2)**2/ \
+    #(n_0*n_s*((np.cos(theta))**2 + (np.cos(theta_2))**2) + (n_0**2 + n_s**2) * np.cos(theta)*np.cos(theta_2))**2
     
     Transmission_coe = 1 - Reflection_coe
     
-    return 1/(2*c) * (n_0 * np.sin(2 * (theta - theta_2)) - n_s * np.sin(theta - theta_2)) * I_GB(rou,z) * Transmission_coe * Transmission_coe * Rs**2 * np.cos(phi) * np.sin(2*theta)
+    return 1/(2*c) * (n_0 * np.sin(2 * (theta - theta_2)) - n_s * np.sin(theta - theta_2)) * I_GB(rou,z) * \
+        Transmission_coe * Transmission_coe * Rs**2 * np.cos(phi) * np.sin(2*theta)
+
+#Calculation of radial force integral
+d = 0
 
 
-d = 100 * 10**(-6)
-
-'''
 a = np.linspace(0, 16*10**(-6), 100) 
 forcenet_r = []
 for a_e in a:
@@ -282,11 +329,27 @@ for a_e in a:
     F_znet = F_1rr[0] + F_1tr[0] + F_2rr[0] + F_2tr[0]
     forcenet_r.append(F_znet * 10 ** 12)
 
-print (forcenet_r)
+#print (forcenet_r)
+    
+#plot out radial force vs offset a
 
+plt.figure(2)
+plt.plot(a*10**(6),forcenet_r, ls="-.", lw=2, c="c", label="plot figure")
+new_ticks1 = np.linspace(0, 16, 9) # plot axis
+print(new_ticks1)
+plt.xticks(new_ticks1)
+plt.yticks(np.linspace(-10, 5, 16))
+ax = plt.gca()
+ax.spines['top'].set_color('none')
+ax.spines['right'].set_color('none')
+ax.xaxis.set_ticks_position('bottom')
+ax.yaxis.set_ticks_position('left')
+ax.spines['left'].set_position(('data',0))
+ax.spines['bottom'].set_position(('data',0))
 
-plt.plot(a,forcenet_r, ls="-.", lw=2, c="c", label="plot figure")
-'''
+plt.xlabel('a(um)',fontsize=15)
+plt.ylabel('F_radial(pN)',fontsize=15)
+plt.show()
 
 '''
 #Radial displacement
@@ -319,15 +382,3 @@ plt.show()
 #plt.plot(a_list, d_list)
 
 
-def r_s(theta, theta2):
-    return (n_0*np.cos(theta) - n_s*np.cos(theta2))/(n_0*np.cos(theta) + n_s*np.cos(theta2))
-
-def r_p(theta, theta2):
-    return (n_s/np.cos(theta2) - n_0/np.cos(theta)) / (n_0/np.cos(theta) + n_s/np.cos(theta2))
-
-def rfcoe(theta, theta2):
-    return (n_0 * n_s)**2 * ((np.cos(theta))**2 - (np.cos(theta2))**2)**2/ \
-    (n_0*n_s*((np.cos(theta))**2 + (np.cos(theta2))**2) + (n_0**2 + n_s**2) * np.cos(theta)*np.cos(theta2))**2
-    
-print (((r_s(np.pi/3, 0.47186) + r_p(np.pi/3, 0.47186))/2)**2)
-print (rfcoe(np.pi/3, 0.47186))
