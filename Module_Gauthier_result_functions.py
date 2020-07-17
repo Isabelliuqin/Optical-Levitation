@@ -26,10 +26,10 @@ def r_p(theta, theta2, n_0, n_s):
     '''Fresnel coefficient of p-polarisation'''
     return (n_0 * np.cos(theta2) - n_s * np.cos(theta))/ (n_s * np.cos(theta) + n_0 * np.cos(theta2))
 
-def rfcoe_sm(theta,theta2):
+def rfcoe_sm(theta,theta2, n_0, n_s):
     
     '''Average reflectance'''
-    return (r_s(theta,theta2)**2 + r_p(theta,theta2)**2)/2
+    return (r_s(theta,theta2, n_0, n_s)**2 + r_p(theta,theta2, n_0, n_s)**2)/2
 
 
 def I_GB(rou, z, w_0, z_R, P):
@@ -67,8 +67,8 @@ def integrand(theta,phi,d, a, Rs, n_0, n_s, w_0, z_R, P):
     
 
     
-    #Reflection_coe = rfcoe_sm(theta,theta_2)
-    Reflection_coe = 1
+    Reflection_coe = rfcoe_sm(theta,theta_2, n_0, n_s)
+    #Reflection_coe = 1
     
     
     return (1/(2*c)) * n_0 * (1 + np.cos(2*theta)) * \
@@ -89,7 +89,7 @@ def integrand_1tz(theta,phi,d, a, Rs, n_0, n_s, w_0, z_R, P):
     
     theta_2 = np.arcsin(n_0*np.sin(theta)/n_s)
  
-    Reflection_coe = rfcoe_sm(theta,theta_2)
+    Reflection_coe = rfcoe_sm(theta,theta_2, n_0, n_s)
     
     
     
@@ -112,7 +112,7 @@ def integrand_2rz(theta,phi,d, a,Rs, n_0, n_s, w_0, z_R, P):
     theta_2 = np.arcsin(n_0*np.sin(theta)/n_s)
     
     
-    Reflection_coe = rfcoe_sm(theta,theta_2)
+    Reflection_coe = rfcoe_sm(theta,theta_2, n_0, n_s)
     
     
     
@@ -135,7 +135,7 @@ def integrand_2tz(theta,phi,d, a,Rs, n_0, n_s, w_0, z_R, P):
     
     theta_2 = np.arcsin(n_0*np.sin(theta)/n_s)
     
-    Reflection_coe = rfcoe_sm(theta,theta_2)
+    Reflection_coe = rfcoe_sm(theta,theta_2, n_0, n_s)
     
     Transmission_coe = 1 - Reflection_coe
     
@@ -153,21 +153,120 @@ def Axial_force_total(d,a,m, Rs, n_0, n_s, w_0, z_R, P):
     forcenet = []
     for d_e in d:
         F_1rz = dblquad(integrand, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d_e, a, Rs, n_0, n_s, w_0, z_R, P))
-        #F_1tz = dblquad(integrand_1tz, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d_e,a))
-        #F_2rz = dblquad(integrand_2rz, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d_e,a))
-        #F_2tz = dblquad(integrand_2tz, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d_e,a))
+        F_1tz = dblquad(integrand_1tz, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d_e,a, Rs, n_0, n_s, w_0, z_R, P))
+        F_2rz = dblquad(integrand_2rz, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d_e,a, Rs, n_0, n_s, w_0, z_R, P))
+        F_2tz = dblquad(integrand_2tz, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d_e,a, Rs, n_0, n_s, w_0, z_R, P))
         #F_z = quad(integrand, 0, np.pi/2, args = (d_e)) #returns a tuple with first element the integral result and second element = upper bound error
         #F_1tz = quad(integrand_1tz, 0, np.pi/2, args = (d_e))
         #F_2rz = quad(integrand_2rz, 0, np.pi/2, args = (d_e))
         #F_2tz = quad(integrand_2tz, 0, np.pi/2, args = (d_e))
     
     
-        F_znet = F_1rz[0] - m * g #+ F_1tz[0] + F_2rz[0] + F_2tz[0]
+        F_znet = F_1rz[0] - m * g + F_1tz[0] + F_2rz[0] + F_2tz[0]
         forcenet.append(F_znet * 10 ** 12)
 
     return forcenet
 
+def disp_velo(d,a,m, Rs, n_0, n_s, w_0, z_R, P, t, y0, r0):
+    
+    g = 9.8
+    
+    d_list = []
+    vz_list = []
+    ya = [1,1]
+    
+    
+    a_list = []
+    vr_list = []
+    ra = [1,1]
+    
+    for i in t: 
+        if i == 0:
+            #Axial disp and velocity update after t = 0
+            F_1rz = dblquad(integrand, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (y0[0], r0[0], Rs, n_0, n_s,w_0, z_R,P)) #returns a tuple with first element the integral result and second element = upper bound error
+            F_1tz = dblquad(integrand_1tz, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (y0[0],r0[0], Rs, n_0, n_s, w_0, z_R, P))
+            F_2rz = dblquad(integrand_2rz, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (y0[0],r0[0], Rs, n_0, n_s, w_0, z_R, P))
+            F_2tz = dblquad(integrand_2tz, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (y0[0],r0[0], Rs, n_0, n_s, w_0, z_R, P))
+            
+            F_znet = F_1rz[0] - m * g +  F_1tz[0] + F_2rz[0] + F_2tz[0]
+            b = F_znet
+            disp_a = 0.5 * b/m * i**2 + y0[1] * i
+            vz = y0[1] + b/m * i
+            
+            #radial disp and velocity update after t = 0
+            F_1rr = dblquad(integrand_1rr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (y0[0],r0[0],Rs, n_0, n_s,w_0, z_R, P)) #returns a tuple with first element the integral result and second element = upper bound error #returns a tuple with first element the integral result and second element = upper bound error
+            F_1tr = dblquad(integrand_1tr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (y0[0],r0[0],Rs, n_0, n_s, w_0, z_R, P))
+            F_2rr = dblquad(integrand_2rr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (y0[0],r0[0],Rs, n_0, n_s, w_0, z_R, P))
+            F_2tr = dblquad(integrand_2tr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (y0[0],r0[0],Rs, n_0, n_s, w_0, z_R, P))
+            
+            b = F_1rr[0]+ F_1tr[0] + F_2rr[0] + F_2tr[0]
+            disp_r = 0.5 * b/m * i**2 + r0[1] * i
+            vr = r0[1] + b/m * i
+        else:
+            #Axial disp and velocity update after t not equal to 0
+            F_1rz = dblquad(integrand, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (ya[0],ra[0],Rs, n_0, n_s, w_0, z_R, P)) #returns a tuple with first element the integral result and second element = upper bound error
+            F_1tz = dblquad(integrand_1tz, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (ya[0],ra[0], Rs, n_0, n_s, w_0, z_R, P))
+            F_2rz = dblquad(integrand_2rz, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (ya[0],ra[0], Rs, n_0, n_s, w_0, z_R, P))
+            F_2tz = dblquad(integrand_2tz, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (ya[0],ra[0], Rs, n_0, n_s, w_0, z_R, P))
+            
+            F_znet = F_1rz[0] - m * g +  F_1tz[0] + F_2rz[0] + F_2tz[0]
+            b = F_znet
+            disp_a = 0.5 * b/m * i**2 + ya[1] * i
+            vz = ya[1] + b/m * i
+            
+            #radial disp and velocity update after t not equal to 00
+            F_1rr = dblquad(integrand_1rr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (ya[0],ra[0],Rs, n_0, n_s,w_0, z_R, P)) #returns a tuple with first element the integral result and second element = upper bound error #returns a tuple with first element the integral result and second element = upper bound error
+            F_1tr = dblquad(integrand_1tr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (ya[0],ra[0],Rs, n_0, n_s, w_0, z_R, P))
+            F_2rr = dblquad(integrand_2rr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (ya[0],ra[0],Rs, n_0, n_s, w_0, z_R, P))
+            F_2tr = dblquad(integrand_2tr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (ya[0],ra[0],Rs, n_0, n_s, w_0, z_R, P))
+            
+            b = F_1rr[0]+ F_1tr[0] + F_2rr[0] + F_2tr[0]
+            disp_r = 0.5 * b/m * i**2 + ra[1] * i
+            vr = ra[1] + b/m * i
+    
+        ya[0] = disp_a
+        ya[1] = vz
+        d_list.append(disp_a)
+        vz_list.append(vz)
+        
+        ra[0] = disp_r
+        ra[1] = vr
+        a_list.append(disp_r)
+        vr_list.append(vr)
+    
+    return d_list, vz_list, a_list, vr_list
 
+def Radial_disp_velo(d,a,m, Rs, n_0, n_s, w_0, z_R, P, t, r0):
+     
+    
+    a_list = []
+    vr_list = []
+    ra = [1,1]
+    for i in t: 
+        if i == 0:
+            F_1rr = dblquad(integrand_1rr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d,r0[0],Rs, n_0, n_s,w_0, z_R, P)) #returns a tuple with first element the integral result and second element = upper bound error #returns a tuple with first element the integral result and second element = upper bound error
+            F_1tr = dblquad(integrand_1tr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d,r0[0],Rs, n_0, n_s, w_0, z_R, P))
+            F_2rr = dblquad(integrand_2rr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d,r0[0],Rs, n_0, n_s, w_0, z_R, P))
+            F_2tr = dblquad(integrand_2tr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d,r0[0],Rs, n_0, n_s, w_0, z_R, P))
+            
+            b = F_1rr[0]+ F_1tr[0] + F_2rr[0] + F_2tr[0]
+            disp = 0.5 * b/m * i**2 + r0[1] * i
+            vr = r0[1] + b/m * i
+        else:
+            F_1rr = dblquad(integrand_1rr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d,ra[0],Rs, n_0, n_s,w_0, z_R, P)) #returns a tuple with first element the integral result and second element = upper bound error #returns a tuple with first element the integral result and second element = upper bound error
+            F_1tr = dblquad(integrand_1tr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d,ra[0],Rs, n_0, n_s, w_0, z_R, P))
+            F_2rr = dblquad(integrand_2rr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d,ra[0],Rs, n_0, n_s, w_0, z_R, P))
+            F_2tr = dblquad(integrand_2tr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d,ra[0],Rs, n_0, n_s, w_0, z_R, P))
+            
+            b = F_1rr[0]+ F_1tr[0] + F_2rr[0] + F_2tr[0]
+            disp = 0.5 * b/m * i**2 + ra[1] * i
+            vr = ra[1] + b/m * i
+    
+        ra[0] = disp
+        ra[1] = vr
+        a_list.append(disp)
+        vr_list.append(vr)
+    return a_list, vr_list
 
 
 
@@ -184,9 +283,9 @@ def integrand_1rr(theta,phi,d, a, Rs, n_0, n_s, w_0, z_R, P):
     
     theta_2 = np.arcsin(n_0*np.sin(theta)/n_s)
     
-    #Reflection_coe = rfcoe_sm(theta,theta_2)
+    Reflection_coe = rfcoe_sm(theta,theta_2, n_0, n_s)
     
-    Reflection_coe = 1
+    #Reflection_coe = 1
     
     
     return - ((n_0/(2*c)) * np.sin(2*theta) * I_GB(rou,z, w_0, z_R, P) * Reflection_coe * Rs**2 * np.cos(phi) * np.sin(2*theta))
@@ -203,7 +302,7 @@ def integrand_1tr(theta,phi,d, a, Rs, n_0, n_s, w_0, z_R, P):
     theta_2 = np.arcsin(n_0*np.sin(theta)/n_s)
  
     
-    Reflection_coe = rfcoe_sm(theta,theta_2)
+    Reflection_coe = rfcoe_sm(theta,theta_2, n_0, n_s)
     
     
     Transmission_coe = 1 - Reflection_coe
@@ -222,7 +321,7 @@ def integrand_2rr(theta,phi,d, a, Rs, n_0, n_s, w_0, z_R, P):
     theta_2 = np.arcsin(n_0*np.sin(theta)/n_s)
    
     
-    Reflection_coe = rfcoe_sm(theta,theta_2)
+    Reflection_coe = rfcoe_sm(theta,theta_2, n_0, n_s)
     
     
     Transmission_coe = 1 - Reflection_coe
@@ -242,7 +341,7 @@ def integrand_2tr(theta,phi,d, a, Rs, n_0, n_s, w_0, z_R, P):
     theta_2 = np.arcsin(n_0*np.sin(theta)/n_s)
     
     
-    Reflection_coe = rfcoe_sm(theta,theta_2)
+    Reflection_coe = rfcoe_sm(theta,theta_2, n_0, n_s)
     
     
     Transmission_coe = 1 - Reflection_coe
@@ -258,12 +357,12 @@ def Radial_force_total(d,a,m, Rs, n_0, n_s, w_0, z_R, P):
     forcenet_r = []
     for a_e in a:
         F_1rr = dblquad(integrand_1rr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d,a_e,Rs, n_0, n_s, w_0, z_R, P)) #returns a tuple with first element the integral result and second element = upper bound error
-        #F_1tr = dblquad(integrand_1tr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d,a_e))
-       #F_2rr = dblquad(integrand_2rr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d,a_e))
-        #F_2tr = dblquad(integrand_2tr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d,a_e))
+        F_1tr = dblquad(integrand_1tr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d,a_e,Rs, n_0, n_s, w_0, z_R, P))
+        F_2rr = dblquad(integrand_2rr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d,a_e,Rs, n_0, n_s, w_0, z_R, P))
+        F_2tr = dblquad(integrand_2tr, 0, 2*np.pi, lambda phi: 0, lambda phi: np.pi/2, args = (d,a_e,Rs, n_0, n_s, w_0, z_R, P))
     
     
-        F_znet = F_1rr[0] #+ F_1tr[0] + F_2rr[0] + F_2tr[0]
+        F_znet = F_1rr[0] + F_1tr[0] + F_2rr[0] + F_2tr[0]
         forcenet_r.append(F_znet * 10 ** 12)
 
     return forcenet_r
