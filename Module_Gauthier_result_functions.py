@@ -58,7 +58,7 @@ def integrand(theta,phi,d, a, Rs, n_0, n_s, w_0, z_R, P):
     #rou = Rs * np.sin(theta) 
     
     rou = np.sqrt(a**2 + Rs**2 * (np.sin(theta))**2 + 2*a*Rs*np.sin(theta) * np.cos(phi)) #represent rou and z by theta
-    
+    #rou = np.sqrt(a**2 + Rs**2 * (np.sin(theta))**2 - 2*a*Rs*np.sin(theta) * np.sin(phi))
     
     z = d
     #+ Rs * (1 - np.cos(theta))
@@ -84,6 +84,7 @@ def integrand_1tz(theta,phi,d, a, Rs, n_0, n_s, w_0, z_R, P):
     #rou = Rs * np.sin(theta) #represent rou and z by theta
     
     rou = np.sqrt(a**2 + Rs**2 * (np.sin(theta))**2 + 2*a*Rs*np.sin(theta) * np.cos(phi))
+    #rou = np.sqrt(a**2 + Rs**2 * (np.sin(theta))**2 - 2*a*Rs*np.sin(theta) * np.sin(phi))
     
     z = d #+ Rs * (1 - np.cos(theta))
     
@@ -106,6 +107,8 @@ def integrand_2rz(theta,phi,d, a,Rs, n_0, n_s, w_0, z_R, P):
     c = 3 * 10**8
     
     rou = np.sqrt(a**2 + Rs**2 * (np.sin(theta))**2 + 2*a*Rs*np.sin(theta) * np.cos(phi))
+    #rou = np.sqrt(a**2 + Rs**2 * (np.sin(theta))**2 - 2*a*Rs*np.sin(theta) * np.sin(phi))
+    
     
     z = d #+ Rs * (1 - np.cos(theta))
     
@@ -130,6 +133,8 @@ def integrand_2tz(theta,phi,d, a,Rs, n_0, n_s, w_0, z_R, P):
     #rou = Rs * np.sin(theta) #represent rou and z by theta
     
     rou = np.sqrt(a**2 + Rs**2 * (np.sin(theta))**2 + 2*a*Rs*np.sin(theta) * np.cos(phi))
+    
+    #rou = np.sqrt(a**2 + Rs**2 * (np.sin(theta))**2 - 2*a*Rs*np.sin(theta) * np.sin(phi))
     
     z = d #+ Rs * (1 - np.cos(theta))
     
@@ -279,6 +284,8 @@ def integrand_1rr(theta,phi,d, a, Rs, n_0, n_s, w_0, z_R, P):
     
     rou = np.sqrt(a**2 + Rs**2 * (np.sin(theta))**2 + 2*a*Rs*np.sin(theta) * np.cos(phi)) #represent rou and z by theta
     
+    
+    #rou = np.sqrt(a**2 + Rs**2 * (np.sin(theta))**2 - 2*a*Rs*np.sin(theta) * np.sin(phi))
     z = d #+ Rs * (1 - np.cos(theta))
     
     theta_2 = np.arcsin(n_0*np.sin(theta)/n_s)
@@ -296,6 +303,8 @@ def integrand_1tr(theta,phi,d, a, Rs, n_0, n_s, w_0, z_R, P):
     c = 3 * 10**8
     
     rou = np.sqrt(a**2 + Rs**2 * (np.sin(theta))**2 + 2*a*Rs*np.sin(theta) * np.cos(phi)) #represent rou and z by theta #represent rou and z by theta
+    
+    #rou = np.sqrt(a**2 + Rs**2 * (np.sin(theta))**2 - 2*a*Rs*np.sin(theta) * np.sin(phi))
     
     z = d #+ Rs * (1 - np.cos(theta))
     
@@ -315,6 +324,8 @@ def integrand_2rr(theta,phi,d, a, Rs, n_0, n_s, w_0, z_R, P):
     c = 3 * 10**8
     
     rou = np.sqrt(a**2 + Rs**2 * (np.sin(theta))**2 + 2*a*Rs*np.sin(theta) * np.cos(phi)) #represent rou and z by theta #represent rou and z by theta
+    
+    #rou = np.sqrt(a**2 + Rs**2 * (np.sin(theta))**2 - 2*a*Rs*np.sin(theta) * np.sin(phi))
     
     z = d #+ Rs * (1 - np.cos(theta))
     
@@ -336,6 +347,8 @@ def integrand_2tr(theta,phi,d, a, Rs, n_0, n_s, w_0, z_R, P):
     
     rou = np.sqrt(a**2 + Rs**2 * (np.sin(theta))**2 + 2*a*Rs*np.sin(theta) * np.cos(phi)) #represent rou and z by theta #represent rou and z by theta
     
+    
+    #rou = np.sqrt(a**2 + Rs**2 * (np.sin(theta))**2 - 2*a*Rs*np.sin(theta) * np.sin(phi))
     z = d + Rs * (1 - np.cos(theta))
     
     theta_2 = np.arcsin(n_0*np.sin(theta)/n_s)
