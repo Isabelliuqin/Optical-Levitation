@@ -28,7 +28,7 @@ def table_parameter(w, rho_0z, rho_0y, rho_0x, rho):
     y = [1, 2, 3, 4, 5, 4, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1]    
     col_labels = ['VALUE']
     row_labels = ['wavelength(um)', 'w_0(um)', 'n_0', 'n_s real', 'n_s imag', 'beam radius w(um)', 'rho_0z(um)', 'rho_0y(um)', 'rho_0x(um)', 'target radius rho(um)']
-    table_vals = [[1.064], [2.67], [1], [0.04], [-7.6097], [w], [rho_0z], [rho_0y], [rho_0x], [rho]]
+    table_vals = [[1.064], [10], [1], [0.04], [-7.6097], [w], [rho_0z], [rho_0y], [rho_0x], [rho]]
 
 # Draw table
     the_table = plt.table(cellText=table_vals,
