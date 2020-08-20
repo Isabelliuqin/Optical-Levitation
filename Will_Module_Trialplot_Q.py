@@ -968,19 +968,6 @@ def Fz_total_gradient(rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P, target, inte
     return output
 
 
-def Fx_total_gradient_vs_Rs_plot(rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P, target):
-    
-    """stiffness stability plot"""
-    forcenet_r = []
-    
-    
-    for rho_e in rho:
-        F_1rr = Fx_total_gradient(rho_0x,rho_0y, rho_e, n_0, n_s, w_0, w, z_R, P, target)
-    
-        
-        forcenet_r.append(F_1rr)
-
-    return forcenet_r  
 
 
 

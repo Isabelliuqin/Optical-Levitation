@@ -44,13 +44,13 @@ c = 3 * 10**8
 
 #TEM01* reflective target Table 6 matching
 
-w_0 = 10 * 10 ** (-6)
+w_0 = 2 * 10 ** (-6)
 
 
 Lambda = 1.064 * 10**(-6)
 #P = 1
 z_R = np.pi* w_0 ** 2 / Lambda
-rho = 30 * 10 ** (-6)
+rho = 60 * 10 ** (-6)
  
 weight = 3.4 * 10**(-10)
 
@@ -76,7 +76,7 @@ P = 0.5 * c * n_0 * Permittivity    #total power of the LG01 beam
 
 
 
-'''
+
 #############################################################
 #3 plot of Q_z vs displacement w for various offset rho_0x
 #############################################################
@@ -87,8 +87,8 @@ P = 0.5 * c * n_0 * Permittivity    #total power of the LG01 beam
 rho_0 = [0,0]   #no offset
 
 
-rho_0[0] = [0, 0.25*w_0, 0.5*w_0, w_0/np.sqrt(2)]
-w = np.linspace(w_0, 60 * 10** (-6), 100)
+rho_0[0] = [0, rho, 2*rho, 3*rho]
+w = np.linspace(w_0, 1.5*np.sqrt(2) * rho, 500)#np.linspace(w_0, 7*rho, 100)
 
 #d = np.sqrt( (z_R ** 2 / w_0 ** 2) * ( w**2 - w_0**2 ))
 
@@ -115,13 +115,13 @@ Q_z3 = Axial_flist_vs_d3 * c / ( n_0 * P )
 plt.figure(1)
 
 
-plt.plot( w * 10 ** (6), Q_z0 , lw=2, c="c", label="rho_0x = 0")
-plt.plot( w * 10 ** (6), Q_z1 , lw=2, c="r", label="rho_0x = 2.5um")
-plt.plot( w * 10 ** (6), Q_z2 , lw=2, c="g", label="rho_0x = 5um")
-plt.plot( w * 10 ** (6), Q_z3 , lw=2, c="y", label="rho_0x = 10/sqrt(2)um")
+plt.plot( w / rho, Q_z0 , lw=2, c="c", label="rho_0x = 0")
+plt.plot( w / rho, Q_z1 , lw=2, c="r", label="rho_0x = rho")
+plt.plot( w / rho, Q_z2 , lw=2, c="g", label="rho_0x = 2*rho")
+plt.plot( w / rho, Q_z3 , lw=2, c="y", label="rho_0x = 3*rho")
 
 
-new_ticks1 = np.linspace(0, 70, 8) # plot axis
+new_ticks1 = np.linspace(0, 7, 8) # plot axis
 print(new_ticks1)
 plt.xticks(new_ticks1,fontsize=20)
 plt.yticks(np.linspace(-2, 0, 5),fontsize=20)
@@ -136,19 +136,20 @@ ax.spines['left'].set_position(('data',0))
 ax.spines['bottom'].set_position(('data',0))
 
 plt.legend(loc=4,fontsize=13)
+plt.title('rho = 60um, w0 = 10um',fontsize=20)
 
-plt.xlabel('w(um)',fontsize=20)
+plt.xlabel('w/rho',fontsize=20)
 plt.ylabel('Qz',fontsize=20)
 plt.grid()
 plt.show()
 
-MTP.table_parameter('x-axis w0 to 60', 'related to w', '0','0, 2.5, 5, 7.07', '30')
+MTP.table_parameter('x-axis w0 to 7rho', 'related to w', '0','0, rho, 2rho, 3rho', '30')
 
 t_finish = time.time()
 
 print(f"script executed in {t_finish-t_start:.2f} seconds")
 
-'''
+
 
 
 

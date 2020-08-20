@@ -141,50 +141,63 @@ plt.grid()
 plt.show()
 
 MTP.table_parameter('sqrt(2)*30um', 'related to w', rho_0[1]* 10 ** 6, 'x-axis -30um to 30um', '15um, 22.5um, 30um')
-
 '''
+
 
 #########################################
 #11 plot Qx vs rho_0x/w0 for various w
 #########################################
 
 
-rho = 30 * 10 ** (-6)
+rho = 60 * 10 ** (-6)
 
-w = [np.sqrt(2) * rho, 2*rho, 2.5*rho]
-
-rho_0 = [ 0 , 0]
-
-rho_0[0] = np.linspace(-rho, rho, 100)
+rho_0 = [0,0]   #no offset
 
 
-radial_flistx0 = np.asarray(TQ.Fx_total_vs_rho0x_plot(rho_0[0],rho_0[1], rho, n_0, n_s, w_0, w[0], z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
+
+w = [0.5 * np.sqrt(2)*rho, np.sqrt(2)*rho, 2*np.sqrt(2)*rho, 3*np.sqrt(2)*rho]
+
+rho_00 = np.linspace(-4*w[0]/np.sqrt(2), 4*w[0]/np.sqrt(2), 100)
+
+rho_01 = np.linspace(-4*w[1]/np.sqrt(2), 4*w[1]/np.sqrt(2), 100)
+
+rho_02 = np.linspace(-4*w[2]/np.sqrt(2), 4*w[2]/np.sqrt(2), 100)
+
+rho_03 = np.linspace(-4*w[3]/np.sqrt(2), 4*w[3]/np.sqrt(2), 100)
+
+
+radial_flistx0 = np.asarray(TQ.Fx_total_vs_rho0x_plot(rho_00,rho_0[1], rho, n_0, n_s, w_0, w[0], z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
 
 Q_x0 = radial_flistx0 * c / ( n_0 * P )
 
 
-radial_flistx1 = np.asarray(TQ.Fx_total_vs_rho0x_plot(rho_0[0],rho_0[1], rho, n_0, n_s, w_0, w[1], z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
+radial_flistx1 = np.asarray(TQ.Fx_total_vs_rho0x_plot(rho_01,rho_0[1], rho, n_0, n_s, w_0, w[1], z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
 
 Q_x1 = radial_flistx1* c / ( n_0 * P )
 
-radial_flistx2 = np.asarray(TQ.Fx_total_vs_rho0x_plot(rho_0[0],rho_0[1], rho, n_0, n_s, w_0, w[2], z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
+radial_flistx2 = np.asarray(TQ.Fx_total_vs_rho0x_plot(rho_02,rho_0[1], rho, n_0, n_s, w_0, w[2], z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
 
 Q_x2 = radial_flistx2 * c / ( n_0 * P )
 
-print (rho_0[0][np.argmax(Q_x0)])
-print (rho_0[0][np.argmax(Q_x1)])
-print (rho_0[0][np.argmax(Q_x2)])
+radial_flistx3 = np.asarray(TQ.Fx_total_vs_rho0x_plot(rho_03,rho_0[1], rho, n_0, n_s, w_0, w[2], z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
+
+Q_x3 = radial_flistx3 * c / ( n_0 * P )
+
+#print (rho_0[0][np.argmax(Q_x0)])
+#print (rho_0[0][np.argmax(Q_x1)])
+#print (rho_0[0][np.argmax(Q_x2)])
 
 
 plt.figure(11)
-plt.plot(rho_0[0] * 10 ** 6, Q_x0, lw=2, c="c", label="w = sqrt(2)*30um")
-plt.plot(rho_0[0] * 10 ** 6, Q_x1, lw=2, c="r", label="w = 60um")
-plt.plot(rho_0[0] * 10 ** 6, Q_x2, lw=2, c="g", label="w = 75um")
+plt.plot(np.sqrt(2)*rho_00 / w[0], Q_x0, lw=2, c="c", label="rho/(w/sqrt(2)) = 2")
+plt.plot(np.sqrt(2)*rho_01 / w[1], Q_x1, lw=2, c="r", label="rho/(w/sqrt(2)) = 1")
+plt.plot(np.sqrt(2)*rho_02 / w[2], Q_x2, lw=2, c="g", label="rho/(w/sqrt(2)) = 1/2")
+plt.plot(np.sqrt(2)*rho_02 / w[2], Q_x3, lw=2, c="y", label="rho/(w/sqrt(2)) = 1/3")
 
-new_ticks1 = np.linspace(-30, 30, 7) # plot axis
+new_ticks1 = np.linspace(-4, 4, 9) # plot axis
 print(new_ticks1)
 plt.xticks(new_ticks1,fontsize=20)
-plt.yticks(np.linspace(-0.08, 0.08, 5),fontsize=20)
+plt.yticks(np.linspace(-0.3, 0.3, 7),fontsize=20)
 
 plt.rc('xtick',labelsize=15)
 plt.rc('ytick',labelsize=15)
@@ -193,17 +206,17 @@ ax.spines['top'].set_color('none')
 ax.spines['right'].set_color('none')
 ax.xaxis.set_ticks_position('bottom')
 ax.yaxis.set_ticks_position('left')
-ax.spines['left'].set_position(('data',-30))
+ax.spines['left'].set_position(('data',-4))
 ax.spines['bottom'].set_position(('data',0))
 
 plt.legend(loc=1,fontsize=13)
 
-plt.xlabel('rho_0x(um)',fontsize=20)
+plt.xlabel('rho_0x/(w/sqrt(2))',fontsize=20)
 plt.ylabel('Qx',fontsize=20)
 
-#plt.title('Qx vs rho_0x/beam waist w0 rho_0y = 0',fontsize=15)
+plt.title('rho = 60um, w0 = 10um',fontsize=15)
 plt.grid()
 plt.show()
 
 
-MTP.table_parameter('sqrt(2)*30, 60, 75', 'related to w', '0', 'x-axis -30 to 30', '30')
+MTP.table_parameter('rho/(w/sqrt(2)) = 2,1,1/2, 1/3', 'related to w', '0', 'x-axis rho_0x/(w/sqrt(2)) = -4 to 4', '60')

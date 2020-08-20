@@ -46,7 +46,7 @@ c = 3 * 10**8
 
 #TEM01* reflective target Table 6 matching
 
-w_0 = 10* 10 ** (-6)
+w_0 = 20* 10 ** (-6)
 
 
 Lambda = 1.064 * 10**(-6)
@@ -77,7 +77,7 @@ Permittivity = 8.85 * 10**(-12)
 P = 0.5 * c * n_0 * Permittivity    #total power of the LG01 beam
 
 
-'''
+
 ######################################
 #5 plot of Q_z vs rho_0x for various w
 ######################################
@@ -86,35 +86,41 @@ rho = 30 * 10 ** (-6)
 
 rho_0 = [0,0]   #no offset
 
-rho_0[0] = np.linspace(-rho, rho, 100)
-
-w = [np.sqrt(2)*rho, 2*rho, 2.5*rho]
 
 
-Axial_flist_vs_d0 =  np.asarray(TQ.Fz_total_vs_rho0x_plot(rho_0[0],rho_0[1], rho, n_0, n_s, w_0, w[0], z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
+w = [0.5 * np.sqrt(2)*rho, np.sqrt(2)*rho, 3*np.sqrt(2)*rho]
+
+rho_00 = np.linspace(-4*w[0]/np.sqrt(2), 4*w[0]/np.sqrt(2), 100)
+
+rho_01 = np.linspace(-4*w[1]/np.sqrt(2), 4*w[1]/np.sqrt(2), 100)
+
+rho_02 = np.linspace(-4*w[2]/np.sqrt(2), 4*w[2]/np.sqrt(2), 100)
+
+
+Axial_flist_vs_d0 =  np.asarray(TQ.Fz_total_vs_rho0x_plot(rho_00,rho_0[1], rho, n_0, n_s, w_0, w[0], z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
 
 Q_z0 = Axial_flist_vs_d0 * c / ( n_0 * P )
 
-Axial_flist_vs_d1 =  np.asarray(TQ.Fz_total_vs_rho0x_plot(rho_0[0],rho_0[1], rho, n_0, n_s, w_0, w[1], z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
+Axial_flist_vs_d1 =  np.asarray(TQ.Fz_total_vs_rho0x_plot(rho_01,rho_0[1], rho, n_0, n_s, w_0, w[1], z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
 
 Q_z1 = Axial_flist_vs_d1 * c / ( n_0 * P )
 
-Axial_flist_vs_d2 =  np.asarray(TQ.Fz_total_vs_rho0x_plot(rho_0[0],rho_0[1], rho, n_0, n_s, w_0, w[2], z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
+Axial_flist_vs_d2 =  np.asarray(TQ.Fz_total_vs_rho0x_plot(rho_02,rho_0[1], rho, n_0, n_s, w_0, w[2], z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
 
 Q_z2 = Axial_flist_vs_d2 * c / ( n_0 * P )
 
 plt.figure(1)
 
 
-plt.plot(rho_0[0] * 10 ** 6, Q_z0 , lw=2, c="c", label="w = sqrt(2)*rho")
-plt.plot(rho_0[0] * 10 ** 6, Q_z1 , lw=2, c="r", label="w = 2rho")
-plt.plot(rho_0[0] * 10 ** 6, Q_z2 , lw=2, c="g", label="w = 2.5rho")
+plt.plot(np.sqrt(2)*rho_00 / w[0], Q_z0 , lw=2, c="c", label="rho/(w/sqrt(2)) = 2")
+plt.plot(np.sqrt(2)*rho_01 / w[1], Q_z1 , lw=2, c="r", label="rho/(w/sqrt(2)) = 1")
+plt.plot(np.sqrt(2)*rho_02 / w[2], Q_z2 , lw=2, c="g", label="rho/(w/sqrt(2)) = 1/3")
 
 
-new_ticks1 = np.linspace(-30, 30, 7) # plot axis
+new_ticks1 = np.linspace(-4, 4, 9) # plot axis
 print(new_ticks1)
 plt.xticks(new_ticks1,fontsize=20)
-plt.yticks(np.linspace(-0.4, 0, 5),fontsize=20)
+plt.yticks(np.linspace(-1.2, 0, 7),fontsize=20)
 ax = plt.gca()
 ax.spines['top'].set_color('none')
 ax.spines['right'].set_color('none')
@@ -124,30 +130,35 @@ ax.spines['left'].set_position(('data',0))
 ax.spines['bottom'].set_position(('data',0))
 
 plt.legend(loc=4,fontsize=13)
+plt.title('rho = 30um, w0 = 20um',fontsize=20)
 
-plt.xlabel('rho_0x(um)',fontsize=20)
+plt.xlabel('rho_0x/(w/sqrt(2))',fontsize=20)
 plt.ylabel('Qz',fontsize=20)
 plt.grid()
 plt.show()
 
-MTP.table_parameter('sqrt(2)*30, 60, 75', 'related to w', '0','x-aixs -30 to 30', '30')
+MTP.table_parameter('0.5*sqrt(2)rho, sqrt(2)rho, 3*sqrt(2)rho', 'related to w', '0','x-aixs rho_0x/(w/sqrt(2)) = -4 to 4', '30')
+
+
+
 '''
-
-
-
 ########################################
 #6 plot of Q_z vs rho_0x for various rho
 ########################################
 
-a = 30 * 10 ** (-6)
+a= 30 * 10 ** (-6)
+
+
 
 w = np.sqrt(2)*rho
 
 rho_0 = [0,0]   #no offset
 
-rho_0[0] = np.linspace(-rho, rho, 100)
+rho_0[0] = np.linspace(-a, a, 100)
 
 rho = [0.5*a, 0.75*a, a]
+
+
 
 
 Axial_flist_vs_d0 =  np.asarray(TQ.Fz_total_vs_rho0x_plot(rho_0[0],rho_0[1], rho[0], n_0, n_s, w_0, w, z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
@@ -174,6 +185,8 @@ new_ticks1 = np.linspace(-1, 1, 5) # plot axis
 print(new_ticks1)
 plt.xticks(new_ticks1,fontsize=20)
 plt.yticks(np.linspace(-0.4, 0, 5),fontsize=20)
+plt.rc('xtick',labelsize=15)
+plt.rc('ytick',labelsize=15)
 ax = plt.gca()
 ax.spines['top'].set_color('none')
 ax.spines['right'].set_color('none')
@@ -190,3 +203,4 @@ plt.grid()
 plt.show()
 
 MTP.table_parameter('sqrt(2)*30', 'related to w', '0','x-aixs -30 to 30', '15, 22.5, 30')
+'''

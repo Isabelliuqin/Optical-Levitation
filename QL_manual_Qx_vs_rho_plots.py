@@ -142,7 +142,7 @@ plt.show()
 MTP.table_parameter('sqrt(2)*30', 'related to w', rho_0[1]* 10 ** 6, '7.5,15,22.5,30', 'x-axis 1 to 90')
 '''
 
-
+'''
 
 ##################################
 #12 plot Qx vs Rs for various w
@@ -152,11 +152,14 @@ a = 30 * 10 ** (-6)
 
 w = [a* np.sqrt(2), 2*a, 2.5*a, 3*a]
 
+
+
 rho_0 = [7.07* 10 ** (-6), 0 ]
 
 
-
 rho = np.linspace(10 ** (-6), 3*a, 100)
+
+
 
 radial_flistx0 = np.asarray(TQ.Fx_total_vs_Rs_plot(rho_0[0],rho_0[1], rho, n_0, n_s, w_0, w[0], z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
 
@@ -208,3 +211,60 @@ plt.show()
 
 MTP.table_parameter('sqrt(2)*30, 60, 75, 90', 'related to w', rho_0[1]* 10 ** 6, '15', 'x-axis 1 to 90')
 
+
+'''
+
+##################################
+#12 plot Qx vs Rs for various w
+##################################
+
+a = 30 * 10 ** (-6)
+
+#w = [a* np.sqrt(2), 2*a, 2.5*a, 3*a]
+
+w = np.linspace(a* np.sqrt(2), 4*a,20)
+
+rho_0 = [7.07* 10 ** (-6), 0 ]
+
+
+rho = np.linspace(10 ** (-6), 3*a, 100)
+
+
+Q_max_location = []
+
+for w_e in w:
+
+
+    radial_flistx0 = np.asarray(TQ.Fx_total_vs_Rs_plot(rho_0[0],rho_0[1], rho, n_0, n_s, w_0, w_e, z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
+
+    Q_x0 = radial_flistx0  * c / ( n_0 * P )
+
+    rho_max = rho[np.argmax(Q_x0)]
+    
+    Q_max_location.append(rho_max)
+
+
+plt.figure(12)
+plt.plot( w/np.sqrt(2) * 10 ** 6, np.array(Q_max_location) * 10 ** 6, lw=2, c="c", label="w = sqrt(2)*30um")
+
+
+new_ticks1 = np.linspace(20, 80, 7) # plot axis
+print(new_ticks1)
+plt.xticks(new_ticks1,fontsize=20)
+plt.yticks(np.linspace(20, 80, 7),fontsize=20)
+ax = plt.gca()
+ax.spines['top'].set_color('none')
+ax.spines['right'].set_color('none')
+ax.xaxis.set_ticks_position('bottom')
+ax.yaxis.set_ticks_position('left')
+ax.spines['left'].set_position(('data',20))
+ax.spines['bottom'].set_position(('data',20))
+
+#plt.legend(loc=4,fontsize=15)
+
+plt.xlabel('w/sqrt(2)(um)',fontsize=20)
+plt.ylabel('max_Qx_rho(um)',fontsize=20)
+
+#plt.title('Qx vs radius/beam waist w0 at w = 10w0 and rho_0x =10 * w0, rho_0y = 0',fontsize=15)
+plt.grid()
+plt.show()

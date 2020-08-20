@@ -77,20 +77,22 @@ Permittivity = 8.85 * 10**(-12)
 P = 0.5 * c * n_0 * Permittivity    #total power of the LG01 beam
 
 
-
+'''
 ##################################
 #9 plot Qx vs w for various rho_0x
 ##################################
 
 rho = 30 * 10 ** (-6)
-w = np.linspace(w_0, 2*rho, 100)
+w = np.linspace(w_0, 7*rho, 100)
 
 
-rho_0z = np.sqrt( (z_R ** 2 / w_0 ** 2) * ( w**2 - w_0**2 ))
+#rho_0z = np.sqrt( (z_R ** 2 / w_0 ** 2) * ( w**2 - w_0**2 ))
 
 rho_0 = [0, 0]
 
-rho_0[0] = [0.25 * w_0, 0.5 * w_0, w_0 / np.sqrt(2)]
+rho_0[0] = [0.75*rho, rho, 2*rho, 3*rho]
+
+#rho_0[0] = [0.25 * w_0, 0.5 * w_0, w_0 / np.sqrt(2)]
 
 
 
@@ -108,13 +110,19 @@ radial_flistx2 = np.asarray(TQ.Fx_total_vs_d_plot(rho_0[0][2],rho_0[1], rho, n_0
 
 Q_x2 = radial_flistx2  * c / ( n_0 * P )
 
+radial_flistx3 = np.asarray(TQ.Fx_total_vs_d_plot(rho_0[0][3],rho_0[1], rho, n_0, n_s, w_0, w, z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
+
+Q_x3 = radial_flistx3  * c / ( n_0 * P )
+
 
 plt.figure(9)
-plt.plot( w * 10 ** 6, Q_x0, lw=2, c="c", label="rho_0x = 2.5um")
+plt.plot( w / (np.sqrt(2) * rho), Q_x0, lw=2, c="c", label="rho_0x/rho = 0.75")
 
-plt.plot( w * 10 ** 6, Q_x1, lw=2, c="r", label="rho_0x = 5um")
+plt.plot( w  / (np.sqrt(2) * rho), Q_x1, lw=2, c="r", label="rho_0x/rho = 1")
 
-plt.plot( w * 10 ** 6, Q_x2, lw=2, c="g", label="rho_0x = 7.5um")
+plt.plot( w  / (np.sqrt(2) * rho), Q_x2, lw=2, c="g", label="rho_0x/rho = 2")
+
+plt.plot( w  / (np.sqrt(2) * rho), Q_x3, lw=2, c="y", label="rho_0x/rho = 3")
 
 print (w[np.argmin(abs(Q_x0))])
 print (w[np.argmin(abs(Q_x1))])
@@ -124,10 +132,10 @@ print (w[np.argmax(Q_x0)])
 print (w[np.argmax(Q_x1)])
 print (w[np.argmax(Q_x2)])
 
-new_ticks1 = np.linspace(0, 60, 7) # plot axis
+new_ticks1 = np.linspace(0, 6, 7) # plot axis
 print(new_ticks1)
 plt.xticks(new_ticks1,fontsize=20)
-plt.yticks(np.linspace(-0.4, 0.1, 6),fontsize=20)
+plt.yticks(np.linspace(-0.9, 0.1, 11),fontsize=20)
 
 plt.rc('xtick',labelsize=15)
 plt.rc('ytick',labelsize=15)
@@ -141,33 +149,30 @@ ax.spines['bottom'].set_position(('data',0))
 
 plt.legend(loc=4,fontsize=13)
 
-plt.xlabel('w(um)',fontsize=20)
+plt.xlabel('w/(sqrt(2)rho)',fontsize=20)
 plt.ylabel('Qx',fontsize=20)
 
-#plt.title('Qx vs w at rho_0x = 10*w_0, rho_0y = 0',fontsize=15)
+plt.title('rho = 30um, w0 = 20um',fontsize=20)
 plt.grid()
 plt.show()
 
 
-MTP.table_parameter('x-axis 10 to 60', 'x-axis', '0', '2.5, 5, 7.07', 30)
+MTP.table_parameter('x-axis w0 to 7rho', 'x-axis', '0', '0.75rho, rho, 2rho, 3rho', 30)
 
 t_finish = time.time()
 
 print(f"script executed in {t_finish-t_start:.2f} seconds")
 
-
-
-
 '''
+
+
+
 ##################################
 #9 plot Qx vs w for various Rs
 ##################################
 
 a = 30 * 10 ** (-6)
-w = np.linspace(w_0, 2*rho, 100)
 
-
-rho_0z = np.sqrt( (z_R ** 2 / w_0 ** 2) * ( w**2 - w_0**2 ))
 
 rho_0 = [0, 0]
 
@@ -175,33 +180,37 @@ rho_0[0] = w_0 / np.sqrt(2)
 
 rho = [0.5 * a, 0.75 * a, a]
 
+w0 = np.linspace(w_0, 2*np.sqrt(2) * rho[0], 100)
 
+w1 = np.linspace(w_0, 2*np.sqrt(2) *rho[1], 100)
 
-radial_flistx0 = np.asarray(TQ.Fx_total_vs_d_plot(rho_0[0],rho_0[1], rho[0], n_0, n_s, w_0, w, z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
+w2 = np.linspace(w_0, 2*np.sqrt(2) *rho[2], 100)
+
+radial_flistx0 = np.asarray(TQ.Fx_total_vs_d_plot(rho_0[0],rho_0[1], rho[0], n_0, n_s, w_0, w0, z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
 
 Q_x0 = radial_flistx0  * c / ( n_0 * P )
 
 
-radial_flistx1 = np.asarray(TQ.Fx_total_vs_d_plot(rho_0[0],rho_0[1], rho[1], n_0, n_s, w_0, w, z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
+radial_flistx1 = np.asarray(TQ.Fx_total_vs_d_plot(rho_0[0],rho_0[1], rho[1], n_0, n_s, w_0, w1, z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
 
 Q_x1 = radial_flistx1  * c / ( n_0 * P )
 
 
-radial_flistx2 = np.asarray(TQ.Fx_total_vs_d_plot(rho_0[0],rho_0[1], rho[2], n_0, n_s, w_0, w, z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
+radial_flistx2 = np.asarray(TQ.Fx_total_vs_d_plot(rho_0[0],rho_0[1], rho[2], n_0, n_s, w_0, w2, z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
 
 Q_x2 = radial_flistx2  * c / ( n_0 * P )
 
 
 plt.figure(9)
-plt.plot( w * 10 ** 6, Q_x0, lw=2, c="c", label="rho = 15um")
+plt.plot( w0 /(np.sqrt(2) *rho[0]), Q_x0, lw=2, c="c", label="rho = 15um")
 
-plt.plot( w * 10 ** 6, Q_x1, lw=2, c="r", label="rho = 22.5um")
+plt.plot( w1 /(np.sqrt(2) *rho[1]), Q_x1, lw=2, c="r", label="rho = 22.5um")
 
-plt.plot( w * 10 ** 6, Q_x2, lw=2, c="g", label="rho = 30um")
+plt.plot( w2 /(np.sqrt(2) *rho[2]), Q_x2, lw=2, c="g", label="rho = 30um")
 
 
 
-new_ticks1 = np.linspace(0, 60, 7) # plot axis
+new_ticks1 = np.linspace(0, 2, 3) # plot axis
 print(new_ticks1)
 plt.xticks(new_ticks1,fontsize=20)
 plt.yticks(np.linspace(-0.4, 0.1, 6),fontsize=20)
@@ -218,7 +227,7 @@ ax.spines['bottom'].set_position(('data',0))
 
 plt.legend(loc=4,fontsize=13)
 
-plt.xlabel('w(um)',fontsize=20)
+plt.xlabel('w/(sqrt(2) *rho)',fontsize=20)
 plt.ylabel('Qx',fontsize=20)
 
 #plt.title('Qx vs w at rho_0x = 10*w_0, rho_0y = 0',fontsize=15)
@@ -226,7 +235,7 @@ plt.grid()
 plt.show()
 
 
-MTP.table_parameter('x-axis 10 to 60', 'x-axis', '0', '7.07', '15, 22.5, 30')'''
+MTP.table_parameter('x-axis w0 to 60', 'x-axis', '0', '7.07', '15, 22.5, 30')
 
 t_finish = time.time()
 

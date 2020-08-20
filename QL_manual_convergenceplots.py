@@ -76,7 +76,7 @@ Permittivity = 8.85 * 10**(-12)
 
 P = 0.5 * c * n_0 * Permittivity    #total power of the LG01 beam
 
-
+'''
 ##########################################
 #Fx convergence
 ##########################################
@@ -288,7 +288,7 @@ start_time = time.time()
 print (TQ.Fz_total(rho_0[0],rho_0[1], rho, n_0, n_s, w_0, w, z_R, P, target = "reflective"))
 
 print("--- %s seconds ---" % (time.time() - start_time))
-
+'''
 
 '''
 ###########################
@@ -333,7 +333,7 @@ ax.set_zlabel('LG_01 intensity', fontsize = 15)
 plt.show()
 
 '''
-'''
+
 ###############################
 #power of LG_01 beam
 ###############################
@@ -384,4 +384,3 @@ plt.xlabel('rmax(um)',fontsize=20)
 plt.ylabel('P(pN)',fontsize=20)
 plt.grid()
 plt.show()
-'''
