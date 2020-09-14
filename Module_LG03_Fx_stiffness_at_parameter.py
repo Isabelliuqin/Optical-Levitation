@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Aug 17 11:40:03 2020
+Created on Mon Aug 31 16:28:52 2020
 
 @author: liuqi
 """
+
+
 
 
 #################################################
@@ -23,11 +25,11 @@ from sympy import *
 from scipy.special import eval_genlaguerre as LGpoly
 #import Module_Gauthier_result_functions as GRF
 from scipy.misc import derivative
-import Will_Module_addwdep as WMTQ
+import Will_Module_addwdep_LG03 as WMTQ
 
 
 def Fx_stiffness_at_parameter(rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P, resolution, target, integration_method, grid_size = 500):
-    'calculation of stiffness at a certain rho_0x'
+    
     chosen_resolution = resolution
     rho_0x_minus_2 = rho_0x - 2 * resolution
     rho_0x_minus_1 = rho_0x - 1 * resolution
@@ -44,7 +46,7 @@ def Fx_stiffness_at_parameter(rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P, reso
     return Fx_grad_output
 
 def Fx_stiffness_vs_w0_plots(rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P, resolution, target, integration_method, grid_size = 500):
-    'calculation of Fx at a certain rho_0x, w at different w0s'
+    
     Fx_grad = []
     
     Lambda = 1.064 * 10**(-6)
@@ -59,9 +61,20 @@ def Fx_stiffness_vs_w0_plots(rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P, resol
     return Fx_grad
 
 
+def Fx_stiffness_vs_rho_plots(rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P, resolution, target, integration_method, grid_size = 500):
+    
+    Fx_grad = []
+    
+    for rho_e in rho:
+        Fx_grad_element = np.mean(Fx_stiffness_at_parameter(rho_0x,rho_0y, rho_e, n_0, n_s, w_0, w, z_R, P, resolution, target, integration_method, grid_size))
+        
+        Fx_grad.append(Fx_grad_element)
+        
+    return Fx_grad
+
 
 def Fx_stiffness_vs_w_plots(rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P, resolution, target, integration_method, grid_size = 500):
-    'calculation of Fx stiffness vs w'
+    
     Fx_grad = []
     
     for w_e in w:

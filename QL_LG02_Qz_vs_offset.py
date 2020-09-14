@@ -89,22 +89,22 @@ rho = 30 * 10 ** (-6)
 rho_0 = [0,0]   #no offset
 
 
-w = [0.65* np.sqrt(2)*rho, 0.675* np.sqrt(2)*rho, 0.7* np.sqrt(2)*rho, 0.725* np.sqrt(2)*rho, 0.75* np.sqrt(2)*rho, 0.775* np.sqrt(2)*rho, 0.8* np.sqrt(2)*rho]
+w = [0.65*rho, 0.675*rho, 0.7* rho, 0.725* rho, 0.75*rho, 0.775*rho, 0.8* rho]
 #w = [w_0, 0.25* np.sqrt(2)*rho, 0.5 * np.sqrt(2)*rho, 0.75* np.sqrt(2)*rho,np.sqrt(2)*rho, 1.25*np.sqrt(2)*rho, 2*np.sqrt(2)*rho]
 
-rho_00 = np.linspace(-3*w[0]/np.sqrt(2), 3*w[0]/np.sqrt(2), 100)
+rho_00 = np.linspace(-3*w[0], 3*w[0], 100)
 
-rho_01 = np.linspace(-3*w[1]/np.sqrt(2), 3*w[1]/np.sqrt(2), 100)
+rho_01 = np.linspace(-3*w[1], 3*w[1], 100)
 
-rho_02 = np.linspace(-3*w[2]/np.sqrt(2), 3*w[2]/np.sqrt(2), 100)
+rho_02 = np.linspace(-3*w[2], 3*w[2], 100)
 
-rho_03 = np.linspace(-3*w[3]/np.sqrt(2), 3*w[3]/np.sqrt(2), 100)
+rho_03 = np.linspace(-3*w[3], 3*w[3], 100)
 
-rho_04 = np.linspace(-3*w[4]/np.sqrt(2), 3*w[4]/np.sqrt(2), 100)
+rho_04 = np.linspace(-3*w[4], 3*w[4], 100)
 
-rho_05 = np.linspace(-3*w[5]/np.sqrt(2), 3*w[5]/np.sqrt(2), 100)
+rho_05 = np.linspace(-3*w[5], 3*w[5], 100)
 
-rho_06 = np.linspace(-3*w[6]/np.sqrt(2), 3*w[6]/np.sqrt(2), 100)
+rho_06 = np.linspace(-3*w[6], 3*w[6], 100)
 
 
 Axial_flist_vs_d0 =  np.asarray(TQ.Fz_total_vs_rho0x_plot(rho_00,rho_0[1], rho, n_0, n_s, w_0, w[0], z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
@@ -138,13 +138,13 @@ Q_z6 = Axial_flist_vs_d6 * c / ( n_0 * P )
 plt.figure(1)
 
 
-plt.plot(np.sqrt(2)*rho_00 / w[0], Q_z0 , lw=2, c="c", label="w/(sqrt(2)rho) = 0.65")
-plt.plot(np.sqrt(2)*rho_01 / w[1], Q_z1 , lw=2, c="r", label="w/(sqrt(2)rho) = 0.675")
-plt.plot(np.sqrt(2)*rho_02 / w[2], Q_z2 , lw=2, c="g", label="w/(sqrt(2)rho) = 0.7")
-plt.plot(np.sqrt(2)*rho_03 / w[3], Q_z3 , lw=2, c="y", label="w/(sqrt(2)rho) = 0.725")
-plt.plot(np.sqrt(2)*rho_04 / w[4], Q_z4 , lw=2, c="b", label="w/(sqrt(2)rho) = 0.75")
-plt.plot(np.sqrt(2)*rho_05 / w[5], Q_z5 , lw=2, c="k", label="w/(sqrt(2)rho) = 0.775")
-plt.plot(np.sqrt(2)*rho_06 / w[6], Q_z6 , lw=2, c="m", label="w/(sqrt(2)rho) = 0.8")
+plt.plot(rho_00 / w[0], Q_z0 , lw=2, c="c", label="w/(sqrt(2)rho) = 0.65")
+plt.plot(rho_01 / w[1], Q_z1 , lw=2, c="r", label="w/(sqrt(2)rho) = 0.675")
+plt.plot(rho_02 / w[2], Q_z2 , lw=2, c="g", label="w/(sqrt(2)rho) = 0.7")
+plt.plot(rho_03 / w[3], Q_z3 , lw=2, c="y", label="w/(sqrt(2)rho) = 0.725")
+plt.plot(rho_04 / w[4], Q_z4 , lw=2, c="b", label="w/(sqrt(2)rho) = 0.75")
+plt.plot(rho_05 / w[5], Q_z5 , lw=2, c="k", label="w/(sqrt(2)rho) = 0.775")
+plt.plot(rho_06 / w[6], Q_z6 , lw=2, c="m", label="w/(sqrt(2)rho) = 0.8")
 
 print ((np.sqrt(2)*rho_03 / w[3])[np.argmin(Q_z3)])
 print ((np.sqrt(2)*rho_04 / w[4])[np.argmin(Q_z4)])
@@ -177,7 +177,9 @@ plt.show()
 
 MTP.table_parameter('see legend', 'related to w', '0','x-aixs rho_0x/(w/sqrt(2)) = -3 to 3', '30')
 '''
-'''
+
+
+
 ################################################
 #Investigation of axial force change vs offsets
 ################################################
@@ -236,8 +238,7 @@ plt.rc('xtick',labelsize=20)
 plt.rc('ytick',labelsize=20)
 plt.grid()
 plt.show()
-'''  
-
+ 
 
 #####################################
 #gradient of Qz vs rho_0x
@@ -249,26 +250,26 @@ rho_0 = [0 , 0]
 
 resolution = 0.01 * 10 ** (-6)
 
-w = np.linspace(0.6 * np.sqrt(2)*rho, 1.5 * np.sqrt(2)*rho, 100)
+w = np.linspace(0.6*rho, 1.5*rho, 100)
 
 grad_Fzlist = []
 
 for we in w:
 
-    rho_0x_in = 0.5 * we / np.sqrt(2)
+    rho_0x_in = 0.5 * we
 
     grad_Fz = np.mean(MFSAP.Fz_rho_0x_stiffness_at_parameter(rho_0x_in, rho_0[1], rho, n_0, n_s, w_0, we, z_R, P, resolution, target = 'reflective', integration_method = integration_method, grid_size = grid_size))
 
     grad_Fzlist.append(grad_Fz*10**8)
 
 plt.figure(13)
-plt.plot(w/(np.sqrt(2) * rho), grad_Fzlist, lw=2, c="c", label="rho_0x/(w/sqrt(2)) = 0.5")
+plt.plot(w/( rho), grad_Fzlist, lw=2, c="c", label="rho_0x/w = 0.5")
 
 
 new_ticks1 = np.linspace(0.6, 1.5, 10) # plot axis
 print(new_ticks1)
 plt.xticks(new_ticks1,fontsize=20)
-plt.yticks(np.linspace(-2, 5, 8),fontsize=20)
+plt.yticks(np.linspace(-5, 2, 8),fontsize=20)
 
 plt.rc('xtick',labelsize=20)
 plt.rc('ytick',labelsize=20)
@@ -282,7 +283,7 @@ ax.spines['bottom'].set_position(('data',0))
 
 plt.legend(loc=4,fontsize=15)
 
-plt.xlabel('w/(sqrt(2)rho)',fontsize=20)
+plt.xlabel('w/rho',fontsize=20)
 plt.ylabel('grad_Fz(stiffness)10^(-8)',fontsize=20)
 
 #plt.title('grad_Fx vs x offset waist w0 at w = w0, rho_0y = 0',fontsize=15)
@@ -352,3 +353,5 @@ plt.show()
 
 MTP.table_parameter('sqrt(2)*30', 'related to w', '0','x-aixs -30 to 30', '15, 22.5, 30')
 '''
+
+

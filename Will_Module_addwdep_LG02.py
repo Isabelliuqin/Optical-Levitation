@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Jul 27 20:22:34 2020
+Created on Mon Aug 31 12:21:11 2020
 
 @author: liuqi
 """
+
 
 
 
@@ -22,58 +23,10 @@ from scipy.special import eval_genlaguerre as LGpoly
 from scipy.misc import derivative
 
 
-def criticalangle(n_s, n_0):
-    """determine critical angle for total internal reflection"""
+########################################
+#MODULE for LG02 intensity profile
+########################################
 
-    theta_c = np.arcsin( ( n_s.real ) / n_0 )
-    
-    return theta_c
-
-
-
-def rfcoe_sm(theta,theta2, n_0, n_s):#
-    
-    """Average reflectance"""
-    
-    r_smodsqr = abs(r_s(theta, theta2, n_0, n_s))**2
-    
-    r_pmodsqr = abs(r_p(theta, theta2, n_0, n_s))**2
-    
-    print (r_smodsqr)
-    
-    print (r_pmodsqr)
-    
-    return (r_smodsqr + r_pmodsqr)/2
-
-def I_GB(r, w, P, n_0):
-    """GB intensity profile"""
-    #Gaussian beam propagation parameters
-    
-    c = 3 * 10**8
-    Permittivity = 8.85 * 10**(-12)
-    
-    I = (2 * P/(np.pi*w**2)) * np.exp( - 2 * r** 2 / w**2)
-    E_modulussquare = 2 * I / (c * n_0 * Permittivity)
-    
-    return E_modulussquare
-
-def TEM01_star(r,w,P):  
-    """TEM01* intensity profile"""
-    mu_0 = 4*np.pi * 10**(-7)
-    c = 3 * 10**8
-    
-    E_modulussquare2 = (8 * mu_0 * c * P / (np.pi * w**2)) * (r**2 / w**2) * np.exp(- 2 * r**2 / w**2)
-    
-    return E_modulussquare2
-
-
-def LG_01_Intensity(r,w):
-    
-    """intensity of LG mode"""
-    
-    #r = np.sqrt(x**2 + y**2)
-    
-    return 2 / np.pi * (1 / w ** 2) * (2 *r**2 / (w ** 2)) *  np.exp(- 2 * r**2 / w**2)
 
 
 
@@ -83,7 +36,8 @@ def LG_01_Intensity(r,w):
 ###################
     # my new funcs
 ##################
-def LG_03_Intensity_sphere_coordinate(theta, phi, rho_0x, rho_0y, rho, w):
+
+def LG_02_Intensity_sphere_coordinate(theta, phi, rho_0x, rho_0y, rho, w, n_0, P):
     
     """intensity of LG mode given sphere angular coordinates and offsets"""
     # theta - sphere theta, array
@@ -96,41 +50,8 @@ def LG_03_Intensity_sphere_coordinate(theta, phi, rho_0x, rho_0y, rho, w):
     
     r = beam_r(theta, phi, rho_0x, rho_0y, rho)
     
-    return 1 /(3*np.pi) * (1 / w ** 2) * (8 *r**6 / (w ** 6)) *  np.exp(- 2 * r**2 / w**2)
-
-
-def LG_02_Intensity_sphere_coordinate(theta, phi, rho_0x, rho_0y, rho, w):
     
-    """intensity of LG mode given sphere angular coordinates and offsets"""
-    # theta - sphere theta, array
-    # phi - sphere phi, array
-    # rho_0x - beam displacement in x, scalar
-    # rho_0y - beam displacement in y, scalar
-    # rho - sphere radius, scalar
-    # w - beam radius at target, scalar
-    
-    
-    r = beam_r(theta, phi, rho_0x, rho_0y, rho)
-    
-    return 1 / np.pi * (1 / w ** 2) * (4 *r**4 / (w ** 4)) *  np.exp(- 2 * r**2 / w**2)
-
-def LG_01_Intensity_sphere_coordinate(theta, phi, rho_0x, rho_0y, rho, w, n_0, P):
-    
-    """intensity of LG mode given sphere angular coordinates and offsets"""
-    # theta - sphere theta, array
-    # phi - sphere phi, array
-    # rho_0x - beam displacement in x, scalar
-    # rho_0y - beam displacement in y, scalar
-    # rho - sphere radius, scalar
-    # w - beam radius at target, scalar
-    
-    Permittivity = 8.85 * 10**(-12)
-    c = 3 * 10**8
-    P_norm = 0.5 * c * n_0 * Permittivity 
-    r = beam_r(theta, phi, rho_0x, rho_0y, rho)
-    
-    return P * 2 / np.pi * (1 / w ** 2) * (2 *r**2 / (w ** 2)) *  np.exp(- 2 * r**2 / w**2)
-
+    return ( P / (np.pi * w ** 2)) * (4 *r**4 / (w ** 4)) *  np.exp(- 2 * r**2 / w**2)
 
 def beam_r(theta, phi, rho_0x, rho_0y, rho):
     """ beam radial coordinate with respect to integration variables"""
@@ -142,6 +63,23 @@ def beam_r(theta, phi, rho_0x, rho_0y, rho):
 
     return np.sqrt( (rho * np.sin(theta) * np.cos(phi) - rho_0x) ** 2 + (rho * np.sin(theta) * np.sin(phi) - rho_0y) ** 2)
 
+
+def beam_w(theta, phi, rho, w, w_0, z_R):
+    """ beam radial coordinate with respect to integration variables"""
+    # theta - sphere theta, array
+    # phi - sphere phi, array
+    # w - beam radius at rho_0z: easier for the rest of the work
+    # rho - sphere radius, scalar
+    # w0 - beam waist
+    # z_R - rayleigh range
+    
+    rho_0z = np.sqrt( (z_R ** 2 / w_0 ** 2) * ( w**2 - w_0**2 )) 
+    
+    axial_offset_at_artibrary_locationonsphere = rho_0z + rho*(1 - np.cos(theta))
+    
+    wnew = w_0 * np.sqrt(1 + axial_offset_at_artibrary_locationonsphere**2/z_R**2)
+
+    return wnew
 
 def spherical_to_cartesian_coordinates(r, theta, phi):
     """ convert spherical coordinates to cartesian"""
@@ -157,71 +95,55 @@ def spherical_to_cartesian_coordinates(r, theta, phi):
 
 
 def r_s(theta, theta2, n_0, n_s):
-    """??? Fresnel coefficient of s-polarisation"""
+    """Fresnel coefficient of s-polarisation"""
     # theta - incident angle, array
     # theta_2 - refracted angle, array
     # n_0 - incident refractive index, scalar
     # n_s - transmitted refractive index ,scalar
     
-    if n_s.real < n_0:
+    
+    theta = np.atleast_2d(theta)
+    
+    r_s1 = np.atleast_2d(np.array(theta, dtype='complex'))
+    
+    r_s1[:] = 0
         
-        theta_c = criticalangle(n_s, n_0)
-        
-        theta = np.atleast_2d(theta)
-        r_s1 = np.atleast_2d(np.array(theta, dtype='complex'))
-        r_s1[:] = 0
-        
-        n = n_s/n_0
-        
-        r_s1 = (n_0*np.cos(theta) - n_s*np.cos(theta2))/(n_0*np.cos(theta) + n_s *np.cos(theta2))
-        
-        #r_s1 = (n_0 * np.cos(theta) - np.sqrt(n_s**2 - (n_0 * np.sin(theta))**2) ) / (n_0 * np.cos(theta) + np.sqrt(n_s**2 - (n_0 * np.sin(theta))**2) ) 
-        # above critical angle
-        
-        #delta = np.arctan(np.sqrt( (np.sin(theta[theta >= theta_c])) ** 2 - n_s**2 / n_0 ** 2) / np.cos(theta[theta >= theta_c])) #Note only take the real part of ns to ensure r_s = 1 -- this is the case for nonabsorbing sphere
-        #r_s1[theta >= theta_c] = np.exp(2 * 1j * delta)  # = np.exp( 2* 1j * delta) : delta has to be real to ensure the modulus sqruare of rs is 1, if not -- attenuation 
-        
-        #below critical angle
-        #r_s1[theta < theta_c] = (n_0*np.cos(theta[theta < theta_c]) - n_s*np.cos(theta2[theta < theta_c]))/(n_0*np.cos(theta[theta < theta_c]) + n_s *np.cos(theta2[theta < theta_c])) #normal refraction formula:note the imaginary part is included     
-     
-        
-    else:
-        r_s1 = (n_0*np.cos(theta) - n_s*np.cos(theta2))/(n_0*np.cos(theta) + n_s *np.cos(theta2))
+    r_s1 = (n_0*np.cos(theta) - n_s*np.cos(theta2))/(n_0*np.cos(theta) + n_s *np.cos(theta2))
     
     return r_s1
 
 def r_p(theta, theta2, n_0, n_s):
     """Fresnel coefficient of p-polarisation"""
+    # theta - incident angle, array
+    # theta_2 - refracted angle, array
+    # n_0 - incident refractive index, scalar
+    # n_s - transmitted refractive index ,scalar
     
-    if n_s.real < n_0:
         
-        theta_c = criticalangle(n_s, n_0)
-        
-        theta = np.atleast_2d(theta)
-        r_p1 = np.atleast_2d(np.array(theta, dtype='complex'))
-        r_p1[:] = np.NaN
-        
-        n = n_s/n_0
-        
-        r_p1 = (n_s / np.cos(theta2) - n_0 / np.cos(theta))/ (n_0 / np.cos(theta) + n_s / np.cos(theta2))
-        #r_p1 = - (n_s**2 * np.cos(theta) - n_0 * np.sqrt(n_s**2 - (n_0 * np.sin(theta))**2)) / (n_s**2 * np.cos(theta) + n_0 * np.sqrt(n_s**2 - (n_0 * np.sin(theta))**2))
-        #below critical angle
-
-        #tan_delta_s = np.sqrt( (np.sin(theta[theta >= theta_c])) ** 2 - n_s**2 / n_0 ** 2) / np.cos(theta[theta >= theta_c]) 
-        
-        #delta_p = np.arctan( (n_0 ** 2 / n_s ** 2) * tan_delta_s )
-        
-        #above critical angle
-        
-        #r_p1[theta >= theta_c] = np.exp(2 * delta_p * 1j)     #total internal reflection, formula see LT6-7 Kenny notes
-        
-                                               
-        #r_p1[theta < theta_c] = (n_s / np.cos(theta2[theta < theta_c]) - n_0 / np.cos(theta[theta < theta_c]))/ (n_0 / np.cos(theta[theta < theta_c]) + n_s / np.cos(theta2[theta < theta_c]))  #normal refraction formula:note the imaginary part is included 
+    theta = np.atleast_2d(theta)
     
-    else: 
-        r_p1 = (n_s / np.cos(theta2) - n_0 / np.cos(theta))/ (n_0 / np.cos(theta) + n_s / np.cos(theta2))
+    r_p1 = np.atleast_2d(np.array(theta, dtype='complex'))
+    
+    r_p1[:] = np.NaN
+        
+    r_p1 = (n_0 * np.cos(theta2) - n_s * np.cos(theta))/ (n_0 * np.cos(theta2) + n_s * np.cos(theta))
     
     return r_p1
+
+def rfcoe_sm(theta,theta2, n_0, n_s):#
+    
+    """Average reflectance"""
+    
+    r_smodsqr = abs(r_s(theta, theta2, n_0, n_s))**2
+    
+    r_pmodsqr = abs(r_p(theta, theta2, n_0, n_s))**2
+    
+    print (r_smodsqr)
+    
+    print (r_pmodsqr)
+    
+    return (r_smodsqr + r_pmodsqr)/2
+
 
 def plot_intensity_sphere_overlap(theta, phi, rho_0x, rho_0y, rho, w):
     """ plot intensity profile and sphere outline"""
@@ -262,24 +184,14 @@ def get_refracted_angle(theta, n_s, n_0):
     # n_0  - refractive index of first medium, scalar, must be real
     
     
-    
-    if n_s.real < n_0:                              #for metallic reflective sphere or low index sphere
-        theta_c = np.arcsin( ( n_s.real ) / n_0 )
-    
-        theta = np.atleast_2d(np.array(theta))  # make theta a numpy array
-        theta_2 = np.copy(theta)   # initialise thea-2 array
+    theta = np.atleast_2d(np.array(theta))  # make theta a numpy array
+    theta_2 = np.copy(theta)   # initialise thea-2 array
         
-        theta_2 = np.arcsin(n_0*np.sin(theta)/n_s)
-        #theta_2[theta <= theta_c] = np.arcsin(n_0*np.sin(theta[theta <= theta_c])/n_s)
-        #theta_2[theta > theta_c] = np.pi/2      # correct entries that should be total internal reflection
         
-        #theta_2 = np.real(theta_2)  # double check array is real
-    else:                                           #for dielectric sphere
-        theta_2 = np.arcsin(n_0*np.sin(theta)/n_s) 
-        
-    
+    theta_2 = np.arcsin(n_0*np.sin(theta)/n_s) 
         
     return theta_2
+
 
 def Fz_integrand_Roosen(theta,phi, rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P, target):
     
@@ -299,7 +211,9 @@ def Fz_integrand_Roosen(theta,phi, rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P,
     # target - string, set as 'reflective' if sphere is reflective, otherwise anything OK and will be ignored
     
     c = 3 * 10**8
+    
     mu_0 = 4*np.pi * 10**(-7)
+    
     Permittivity = 8.85 * 10**(-12) 
     
     
@@ -307,18 +221,14 @@ def Fz_integrand_Roosen(theta,phi, rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P,
     
     r = beam_r(theta, phi, rho_0x, rho_0y, rho) #represent r(the parameter of laser beam) by theta
     
-    
+    wnew = beam_w(theta, phi, rho, w, w_0, z_R)    #represent w(parameter of laser beam a variable)
     
 
     theta_2 = get_refracted_angle(theta, n_s, n_0)
+    
     Reflection_coe = rfcoe_sm(theta,theta_2, n_0, n_s)
-    #print (theta_2)
     
-    R = np.around(Reflection_coe, decimals= 15)     #turn 0.99999 to 1.0
-    
-    #print (R)
-    
-    I = LG_01_Intensity_sphere_coordinate(theta, phi, rho_0x, rho_0y, rho, w, n_0, P)   # beam intensity
+    I = LG_02_Intensity_sphere_coordinate(theta, phi, rho_0x, rho_0y, rho, wnew, n_0, P)   # beam intensity
     
     if target == "reflective":                      #reflective sphere has T = 0 by definition, R mignt not = 1
         Tranmission = 0
@@ -366,7 +276,9 @@ def Fy_integrand_Roosen(theta,phi, rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P,
     # target - string, set as 'reflective' if sphere is reflective, otherwise anything OK and will be ignored
     
     c = 3 * 10**8
+    
     mu_0 = 4*np.pi * 10**(-7)
+    
     Permittivity = 8.85 * 10**(-12) 
     
     
@@ -374,15 +286,17 @@ def Fy_integrand_Roosen(theta,phi, rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P,
     
     r = beam_r(theta, phi, rho_0x, rho_0y, rho) #represent rou and z by theta
     
+    wnew = beam_w(theta, phi, rho, w, w_0, z_R)    #represent w(parameter of laser beam a variable)
+    
                   
     theta_2 = get_refracted_angle(theta, n_s, n_0)
 
     
     Reflection_coe = rfcoe_sm(theta,theta_2, n_0, n_s)
     
-    R = np.around(Reflection_coe, decimals= 15)
     
-    I = LG_01_Intensity_sphere_coordinate(theta, phi, rho_0x, rho_0y, rho, w, n_0, P)   # beam intensity
+    
+    I = LG_02_Intensity_sphere_coordinate(theta, phi, rho_0x, rho_0y, rho, wnew, n_0, P)   # beam intensity
     
     if target == "reflective":
         Tranmission = 0
@@ -425,7 +339,9 @@ def Fx_integrand_Roosen(theta, phi, rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P
    
     
     c = 3 * 10**8
+    
     mu_0 = 4*np.pi * 10**(-7)
+    
     Permittivity = 8.85 * 10**(-12) 
     
     
@@ -433,15 +349,16 @@ def Fx_integrand_Roosen(theta, phi, rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P
     
     r = beam_r(theta, phi, rho_0x, rho_0y, rho) #represent rou and z by theta
     
+    wnew = beam_w(theta, phi, rho, w, w_0, z_R)    #represent w(parameter of laser beam a variable)
+        
                   
     theta_2 = get_refracted_angle(theta, n_s, n_0)
 
     
     Reflection_coe = rfcoe_sm(theta,theta_2, n_0, n_s)
     
-    R = np.around(Reflection_coe, decimals= 15)
-    
-    I = LG_01_Intensity_sphere_coordinate(theta, phi, rho_0x, rho_0y, rho, w, n_0, P)   # beam intensity
+   
+    I = LG_02_Intensity_sphere_coordinate(theta, phi, rho_0x, rho_0y, rho, wnew, n_0, P)   # beam intensity
     
     if target == "reflective":
         Tranmission = 0
@@ -488,6 +405,7 @@ def F_total_manual_integration(rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P, tar
     g = 9.8
     
     theta = np.linspace(0, np.pi/2, grid_size)
+    
     theta_step = theta[1] - theta[0]
     
     phi = np.linspace(0, 2*np.pi, grid_size)
@@ -507,7 +425,7 @@ def F_total_manual_integration(rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P, tar
     force_total = force_grid.sum() * theta_step * phi_step
     
     
-    I = LG_01_Intensity_sphere_coordinate(theta, phi, rho_0x, rho_0y, rho, w, n_0, P)
+    I = LG_02_Intensity_sphere_coordinate(theta, phi, rho_0x, rho_0y, rho, w, n_0, P)
     
     cartesian_grid = spherical_to_cartesian_coordinates(rho, theta, phi)
     
@@ -548,7 +466,9 @@ def Fx_total(rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P, target):
     return F_x
 
 
-
+#################################################################
+    #plot
+##################################################################
 def Fz_total_vs_d_plot(rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P, target, integration_method = "integrated", grid_size = 500):
     
     # integration_method - str, 'integrated' or 'manual', use integrated or manual integration method
@@ -707,7 +627,7 @@ def Fy_total_vs_d_plot(rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P, target, int
     
     return forcenet
 
-
+##############################################################################################
 def xy_plane_vectorplot(rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P, target):
     forcenet_x = []
     
@@ -879,7 +799,7 @@ def Fx_total_vs_Rs_plot(rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P, target, in
     
     return forcenet_r  
 
-
+##################################################################################################
 
 
 
@@ -916,7 +836,7 @@ def Fx_total_gradient(rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P, target, inte
     for i in range( 1, len(forcenet_r) ):
         grad_Fxelement = ( forcenet_r[i] - forcenet_r[i-1] ) / (rho_0x[i] - rho_0x[i-1])
         
-        rho_0xelement = (rho_0x[i] + rho_0x[i-1]) / (2 * (w / np.sqrt(2)) )
+        rho_0xelement = (rho_0x[i] + rho_0x[i-1]) / (2 * w )
         
         grad_Fx.append(grad_Fxelement)
         
@@ -964,7 +884,7 @@ def Fy_total_gradient(rho_0x,rho_0y, rho, n_0, n_s, w_0, w, z_R, P, target, inte
     for i in range( 1, len(forcenet_r) ):
         grad_Fyelement = ( forcenet_r[i] - forcenet_r[i-1] ) / (rho_0y[i] - rho_0y[i-1])
         
-        rho_0yelement = (rho_0y[i] + rho_0y[i-1]) / (2 * (w / np.sqrt(2)) )
+        rho_0yelement = (rho_0y[i] + rho_0y[i-1]) / (2 *w)
         
         grad_Fy.append(grad_Fyelement)
         

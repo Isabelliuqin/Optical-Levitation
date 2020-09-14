@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
 """
+Created on Sat Aug 29 17:16:40 2020
+
+@author: liuqi
+"""
+
+
+# -*- coding: utf-8 -*-
+"""
 Created on Thu Aug 13 10:58:43 2020
 
 @author: liuqi
@@ -16,7 +24,7 @@ from scipy.integrate import quad
 import seaborn
 from scipy.integrate import odeint
 from scipy.integrate import dblquad
-import Will_Module_Trialplot_Q as TQ
+import Will_Module_addwdep as TQ
 import Module_table_parameter as MTP
 import Module_integration_manually as MIM
 
@@ -31,29 +39,25 @@ import time
 
 
 integration_method = 'manual'   # 'manual' or 'integrated'
-grid_size = 200
+grid_size = 400
 
 plt.close('all')
 
 ###########################
 
-t_start = time.time()
-
-
 #Our sphere
 
-g = 9.8 #gravitational acceleration
+g = 9.8
+
 c = 3 * 10**8
-#m = 4/3 * np.pi * Rs**3 * (sig_s - sig_0)
 
-#TEM01* reflective target Table 6 matching
-
-w_0 = 10* 10 ** (-6)
-
+#w_0 = 2 * 10 ** (-6)
+w_0 = 0.85 * 10 ** (-6)  #optimal w0 for stiffness matching
 
 Lambda = 1.064 * 10**(-6)
-#P = 1
+
 z_R = np.pi* w_0 ** 2 / Lambda
+
 rho = 30 * 10 ** (-6)
  
 weight = 3.4 * 10**(-10)
@@ -66,31 +70,28 @@ k = 7.6097
 
 n_s = n_s_n - k*1j
 
-sig_s = 10.49 * 10 ** 3 * (( 3 ** 3 - 2.25 ** 3 )/ 3 ** 3 ) #density of sphere in kg/m^3
+sig_s = 10.49 * 10 ** 3 * (( 3 ** 3 - 2.25 ** 3) / 3 ** 3 ) #density of sphere in kg/m^3
 
 sig_0 = 0 #density of medium in kg/m^3
-
-
 
 m = 4/3 * np.pi * rho ** 3 * ( sig_s - sig_0 )
 
 Permittivity = 8.85 * 10**(-12)
 
-P = 0.5 * c * n_0 * Permittivity    #total power of the LG01 beam
+#P = 0.5 * c * n_0 * Permittivity    #total power of the LG01 beam
 
+P = 12.03    #optimal power for stiffness matching and stable equilibrium
 
 '''
 ######################################
-#5 plot of Q_z vs rho_0x for various w
+#plot of Q_z vs rho_0x for various w
 ######################################
-
-rho = 30 * 10 ** (-6)
 
 rho_0 = [0,0]   #no offset
 
 
-w = [0.65* np.sqrt(2)*rho, 0.675* np.sqrt(2)*rho, 0.7* np.sqrt(2)*rho, 0.725* np.sqrt(2)*rho, 0.75* np.sqrt(2)*rho, 0.775* np.sqrt(2)*rho, 0.8* np.sqrt(2)*rho]
-#w = [w_0, 0.25* np.sqrt(2)*rho, 0.5 * np.sqrt(2)*rho, 0.75* np.sqrt(2)*rho,np.sqrt(2)*rho, 1.25*np.sqrt(2)*rho, 2*np.sqrt(2)*rho]
+#w = [0.65* np.sqrt(2)*rho, 0.675* np.sqrt(2)*rho, 0.7* np.sqrt(2)*rho, 0.725* np.sqrt(2)*rho, 0.75* np.sqrt(2)*rho, 0.775* np.sqrt(2)*rho, 0.8* np.sqrt(2)*rho]
+w = [w_0, 0.25* np.sqrt(2)*rho, 0.5 * np.sqrt(2)*rho, 0.75* np.sqrt(2)*rho,np.sqrt(2)*rho, 1.25*np.sqrt(2)*rho, 2*np.sqrt(2)*rho]
 
 rho_00 = np.linspace(-3*w[0]/np.sqrt(2), 3*w[0]/np.sqrt(2), 100)
 
@@ -135,7 +136,18 @@ Axial_flist_vs_d6 =  np.asarray(TQ.Fz_total_vs_rho0x_plot(rho_06,rho_0[1], rho, 
 
 Q_z6 = Axial_flist_vs_d6 * c / ( n_0 * P )
 
+Q_weight = m*g*c/(n_0 * P)
+
 plt.figure(1)
+
+
+#plt.plot(np.sqrt(2)*rho_00 / w[0], Q_z0 , lw=2, c="c", label='w = w0')
+#plt.plot(np.sqrt(2)*rho_01 / w[1], Q_z1 , lw=2, c="r", label='(w/sqrt{2})/rho = 0.25')
+#plt.plot(np.sqrt(2)*rho_02 / w[2], Q_z2 , lw=2, c="g", label="w/(sqrt(2)rho) = 0.5")
+#plt.plot(np.sqrt(2)*rho_03 / w[3], Q_z3 , lw=2, c="y", label="w/(sqrt(2)rho) = 0.75")
+plt.plot(np.sqrt(2)*rho_04 / w[4], Q_z4 + Q_weight, lw=2, c="c", label="w/(sqrt(2)rho) = 1")
+#plt.plot(np.sqrt(2)*rho_05 / w[5], Q_z5 , lw=2, c="m", label="w/(sqrt(2)rho) = 1.25")
+#plt.plot(np.sqrt(2)*rho_06 / w[6], Q_z6 , lw=2, c="m", label="w/(sqrt(2)rho) = 2")
 
 
 plt.plot(np.sqrt(2)*rho_00 / w[0], Q_z0 , lw=2, c="c", label="w/(sqrt(2)rho) = 0.65")
@@ -145,6 +157,7 @@ plt.plot(np.sqrt(2)*rho_03 / w[3], Q_z3 , lw=2, c="y", label="w/(sqrt(2)rho) = 0
 plt.plot(np.sqrt(2)*rho_04 / w[4], Q_z4 , lw=2, c="b", label="w/(sqrt(2)rho) = 0.75")
 plt.plot(np.sqrt(2)*rho_05 / w[5], Q_z5 , lw=2, c="k", label="w/(sqrt(2)rho) = 0.775")
 plt.plot(np.sqrt(2)*rho_06 / w[6], Q_z6 , lw=2, c="m", label="w/(sqrt(2)rho) = 0.8")
+
 
 print ((np.sqrt(2)*rho_03 / w[3])[np.argmin(Q_z3)])
 print ((np.sqrt(2)*rho_04 / w[4])[np.argmin(Q_z4)])
@@ -156,9 +169,9 @@ print ((np.sqrt(2)*rho_06 / w[6])[np.argmin(Q_z6)])
 new_ticks1 = np.linspace(-3, 3, 7) # plot axis
 print(new_ticks1)
 plt.xticks(new_ticks1,fontsize=20)
-plt.yticks(np.linspace(-1, 0, 6),fontsize=20)
-plt.rc('xtick',labelsize=15)
-plt.rc('ytick',labelsize=15)
+plt.yticks(np.linspace(-0.2, 0.2, 5),fontsize=20)
+plt.rc('xtick',labelsize=20)
+plt.rc('ytick',labelsize=20)
 ax = plt.gca()
 ax.spines['top'].set_color('none')
 ax.spines['right'].set_color('none')
@@ -167,22 +180,33 @@ ax.yaxis.set_ticks_position('left')
 ax.spines['left'].set_position(('data',-3))
 ax.spines['bottom'].set_position(('data',0))
 
-plt.legend(loc=4,fontsize=15)
-plt.title('rho = 30um, w0 = 10um',fontsize=20)
+plt.legend(loc=4,fontsize=16)
+plt.title('rho = 30um, w0 = 0.85um',fontsize=20)
 
-plt.xlabel('rho_0x/(w/sqrt(2))',fontsize=20)
-plt.ylabel('Qz',fontsize=20)
+#plt.xlabel(r"$\rho_{0x}/(w/\sqrt{2})$",fontsize=20)
+plt.ylabel('Qz + Qw',fontsize=20)
 plt.grid()
 plt.show()
 
-MTP.table_parameter('see legend', 'related to w', '0','x-aixs rho_0x/(w/sqrt(2)) = -3 to 3', '30')
+'''
+'''
+#################################################
+#coupling ratio at optimal trapping postion
+#################################################
+
+Qmin = np.min(Q_z4)
+
+axial_centre_max = TQ.F_total_manual_integration(0, rho_0[1], rho, n_0, n_s, w_0, np.sqrt(2)*rho, z_R, P, target = "reflective", coordinate = 'z', grid_size = grid_size)['force_total']
+
+Q_zmax = axial_centre_max  * c / ( n_0 * P )
+
+fluct_ratio = (Q_zmax - Qmin)/abs(Q_zmax)
+
 '''
 '''
 ################################################
 #Investigation of axial force change vs offsets
 ################################################
-
-rho = 30 * 10 ** (-6)
 
 rho_0 = [0,0]   #no offset
 
@@ -218,6 +242,7 @@ for we in w:
     diff = Q_zmax - axial_min
     
     diffe.append(diff)
+    
     fluct_ratio = (Q_zmax - axial_min)/abs(Q_zmax)
     
     ratio.append(fluct_ratio)
@@ -226,23 +251,27 @@ print(axialmin)
 print(axialmax)
 print(diffe)
 print(w_minloc)
-plt.plot(w/(np.sqrt(2)*rho), ratio , lw=2, c="c", label="w = w_0")
 
-plt.title('rho = 30um, w0 = 10um',fontsize=20)
 
-plt.xlabel('w/(sqrt(2)*rho)',fontsize=20)
+plt.plot(w/(np.sqrt(2)*rho), ratio , lw=2, c="c", label=r'$w = w_{0}$')
+
+plt.title(r"$\rho = 30um, w_{0} = 2um$",fontsize=20)
+
+plt.xlabel('w/(sqrt(2)rho)',fontsize=20)
 plt.ylabel('ratio',fontsize=20)
 plt.rc('xtick',labelsize=20)
 plt.rc('ytick',labelsize=20)
 plt.grid()
 plt.show()
-'''  
+
+
+'''
 
 
 #####################################
 #gradient of Qz vs rho_0x
 #####################################
-rho = 30 * 10 ** (-6)
+
 
 
 rho_0 = [0 , 0]
@@ -259,16 +288,17 @@ for we in w:
 
     grad_Fz = np.mean(MFSAP.Fz_rho_0x_stiffness_at_parameter(rho_0x_in, rho_0[1], rho, n_0, n_s, w_0, we, z_R, P, resolution, target = 'reflective', integration_method = integration_method, grid_size = grid_size))
 
-    grad_Fzlist.append(grad_Fz*10**8)
+    grad_Fzlist.append(grad_Fz*10**4)
 
 plt.figure(13)
 plt.plot(w/(np.sqrt(2) * rho), grad_Fzlist, lw=2, c="c", label="rho_0x/(w/sqrt(2)) = 0.5")
 
+print ((w/(np.sqrt(2) * rho))[np.argmin(abs(np.array(grad_Fzlist)))]) #print the inflection point
 
 new_ticks1 = np.linspace(0.6, 1.5, 10) # plot axis
 print(new_ticks1)
 plt.xticks(new_ticks1,fontsize=20)
-plt.yticks(np.linspace(-2, 5, 8),fontsize=20)
+plt.yticks(np.linspace(-3, 2, 6),fontsize=20)
 
 plt.rc('xtick',labelsize=20)
 plt.rc('ytick',labelsize=20)
@@ -280,75 +310,12 @@ ax.yaxis.set_ticks_position('left')
 ax.spines['left'].set_position(('data', 0.6))
 ax.spines['bottom'].set_position(('data',0))
 
-plt.legend(loc=4,fontsize=15)
+plt.legend(loc=1,fontsize=16)
 
 plt.xlabel('w/(sqrt(2)rho)',fontsize=20)
-plt.ylabel('grad_Fz(stiffness)10^(-8)',fontsize=20)
+plt.ylabel('grad_Fz(10^(-4)N/m)',fontsize=20)
 
-#plt.title('grad_Fx vs x offset waist w0 at w = w0, rho_0y = 0',fontsize=15)
+plt.title('rho = 30um, w0 = 0.85um',fontsize=20)
 plt.grid()
 plt.show()
 
-'''
-########################################
-#6 plot of Q_z vs rho_0x for various rho
-########################################
-
-a= 30 * 10 ** (-6)
-
-
-
-w = np.sqrt(2)*rho
-
-rho_0 = [0,0]   #no offset
-
-rho_0[0] = np.linspace(-a, a, 100)
-
-rho = [0.5*a, 0.75*a, a]
-
-
-
-
-Axial_flist_vs_d0 =  np.asarray(TQ.Fz_total_vs_rho0x_plot(rho_0[0],rho_0[1], rho[0], n_0, n_s, w_0, w, z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
-
-Q_z0 = Axial_flist_vs_d0 * c / ( n_0 * P )
-
-Axial_flist_vs_d1 =  np.asarray(TQ.Fz_total_vs_rho0x_plot(rho_0[0],rho_0[1], rho[1], n_0, n_s, w_0, w, z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
-
-Q_z1 = Axial_flist_vs_d1 * c / ( n_0 * P )
-
-Axial_flist_vs_d2 =  np.asarray(TQ.Fz_total_vs_rho0x_plot(rho_0[0],rho_0[1], rho[2], n_0, n_s, w_0, w, z_R, P, target = "reflective", integration_method = integration_method, grid_size = grid_size))
-
-Q_z2 = Axial_flist_vs_d2 * c / ( n_0 * P )
-
-plt.figure(2)
-
-
-plt.plot(rho_0[0]/a, Q_z0 , lw=2, c="c", label="rho = 15um")
-plt.plot(rho_0[0]/a, Q_z1 , lw=2, c="r", label="rho = 22.5um")
-plt.plot(rho_0[0]/a, Q_z2 , lw=2, c="g", label="rho = 30um")
-
-
-new_ticks1 = np.linspace(-1, 1, 5) # plot axis
-print(new_ticks1)
-plt.xticks(new_ticks1,fontsize=20)
-plt.yticks(np.linspace(-0.4, 0, 5),fontsize=20)
-plt.rc('xtick',labelsize=15)
-plt.rc('ytick',labelsize=15)
-ax = plt.gca()
-ax.spines['top'].set_color('none')
-ax.spines['right'].set_color('none')
-ax.xaxis.set_ticks_position('bottom')
-ax.yaxis.set_ticks_position('left')
-ax.spines['left'].set_position(('data',0))
-ax.spines['bottom'].set_position(('data',0))
-
-plt.legend(loc=4,fontsize=13)
-
-plt.xlabel('rho_0x/(w/sqrt(2))',fontsize=20)
-plt.ylabel('Qz',fontsize=20)
-plt.grid()
-plt.show()
-
-MTP.table_parameter('sqrt(2)*30', 'related to w', '0','x-aixs -30 to 30', '15, 22.5, 30')
-'''
