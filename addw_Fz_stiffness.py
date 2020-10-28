@@ -76,9 +76,9 @@ Permittivity = 8.85 * 10**(-12)
 
 P = 12.03
 
-'''
+
 #############################################
-#13 plot gradient Fz vs w for various offsets
+#FIG 3.7b) 13 plot gradient Fz vs w for various offsets
 #############################################
 
 w = np.linspace(w_0, 2*np.sqrt(2) * rho, 100)
@@ -156,10 +156,10 @@ plt.title('rho = 30um, w0 = 2um',fontsize=20)
 plt.grid()
 plt.show()
 
-'''
+
 
 ###################################################
-#Fz gradient vs w0 for various w/sqrt(2) = rho
+#FIG 3.8 Fz gradient vs w0 for various w/sqrt(2) = rho
 ###################################################
 
 
@@ -180,7 +180,7 @@ grad_z0 = np.asarray(FTAPz.Fz_stiffness_vs_w0_plots(rho_0[0], rho_0[1], rho, n_0
 
 grad_x0 = np.asarray(FTAPx.Fx_stiffness_vs_w0_plots(rho_0[0], rho_0[1], rho, n_0, n_s, w_0, w, z_R, P, resolution, target = 'reflective', integration_method = integration_method, grid_size = grid_size))
     
-
+plt.figure(14)
 plt.plot( w_0 * 10 ** 6, (-grad_z0*10**4 / (-grad_x0*10**4)), lw=2, c="c", label="kz / kx, w/(sqrt(2)rho) = 1")
 print ((w_0 * 10 ** 6)[np.argmin(abs((-grad_z0*10**8 / (-grad_x0*10**8)) - 1))] ) 
 plt.axhline(y=1, color='r', linestyle='-', label = "kz / kx = 1")

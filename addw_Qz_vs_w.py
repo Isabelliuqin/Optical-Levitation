@@ -35,7 +35,7 @@ import time
 ############################
 
 integration_method = 'manual'   # 'manual' or 'integrated'
-grid_size = 400
+grid_size = 200
 
 plt.close('all')
 
@@ -76,9 +76,9 @@ Permittivity = 8.85 * 10**(-12)
 
 P = 12    #optimal power for stiffness matching and stable equilibrium
 
-'''
+
 #############################################################
-#plot of Q_z vs displacement w for various offset rho_0x
+#FIG 3.2a)   plot of Q_z vs displacement w for various offset rho_0x
 #############################################################
 
 rho_0 = [0,0]   #no offset
@@ -123,12 +123,12 @@ Q_weight = m*g*c/(n_0 * P)
 Qw = 0.5
 
 plt.plot( w / (np.sqrt(2)*rho), Q_z0 + Q_weight , lw=2, c="r", label="rho_0x/rho = 0")
-#plt.plot( w / (np.sqrt(2)*rho), Q_z1 , lw=2, c="r", label="rho_0x/rho = 0.25")
-#plt.plot( w / (np.sqrt(2)*rho), Q_z2 , lw=2, c="g", label="rho_0x/rho = 0.5")
-#plt.plot( w / (np.sqrt(2)*rho), Q_z3 , lw=2, c="y", label="rho_0x/rho = 0.75")
-#plt.plot( w / (np.sqrt(2)*rho), Q_z4 + Q_weight , lw=2, c="r", label="rho_0x/rho = 1")
-#plt.plot( w / (np.sqrt(2)*rho), Q_z5 , lw=2, c="m", label="rho_0x/rho = 1.25")
-#plt.plot( w / (np.sqrt(2)*rho), Q_z6 , lw=2, c="m", label="rho_0x/rho = 2")
+plt.plot( w / (np.sqrt(2)*rho), Q_z1 , lw=2, c="r", label="rho_0x/rho = 0.25")
+plt.plot( w / (np.sqrt(2)*rho), Q_z2 , lw=2, c="g", label="rho_0x/rho = 0.5")
+plt.plot( w / (np.sqrt(2)*rho), Q_z3 , lw=2, c="y", label="rho_0x/rho = 0.75")
+plt.plot( w / (np.sqrt(2)*rho), Q_z4 + Q_weight , lw=2, c="r", label="rho_0x/rho = 1")
+plt.plot( w / (np.sqrt(2)*rho), Q_z5 , lw=2, c="m", label="rho_0x/rho = 1.25")
+plt.plot( w / (np.sqrt(2)*rho), Q_z6 , lw=2, c="m", label="rho_0x/rho = 2")
 
 
 new_ticks1 = np.linspace(0, 2, 5) # plot axis
@@ -150,10 +150,10 @@ ax.spines['bottom'].set_position(('data',0))
 plt.ylabel('Qz + Qw',fontsize=20)
 plt.grid()
 plt.show()
-'''
 
+'''
 ######################################################
-#1 plot of Q_z vs displacement d
+#FIG 3.10a)   1 plot of Q_z vs displacement d
 ######################################################
 
 rho_0 = [0,0]   #no offset
@@ -199,4 +199,4 @@ plt.ylabel('Qz + Qw',fontsize=20)
 plt.title('rho = 30um, w0 = 0.85um',fontsize=20)
 plt.grid()
 plt.show()
-
+'''

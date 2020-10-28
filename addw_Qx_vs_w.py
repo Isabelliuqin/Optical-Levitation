@@ -68,7 +68,7 @@ P = 12  #optimal power required to levitate at w0 = 0.85um
 
 '''
 ##################################
-#plot Qx vs w for various rho_0x
+#FIG 3.3a) & FIG 3.6  plot Qx vs w for various rho_0x
 ##################################
 
 
@@ -158,9 +158,9 @@ plt.grid()
 plt.show()
 '''
 
-
+'''
 ############################################
-#maximal allowable radial offset
+#FIG 3.9c) maximal allowable radial offset
 ############################################
 
 rho_0x = np.linspace(0,2*rho,100)
@@ -206,52 +206,5 @@ plt.ylabel('Qx',fontsize=20)
 plt.title('rho = 30um, w0 = 0.85um',fontsize=20)
 plt.grid()
 plt.show()
-
 '''
-############################################
-#maximal allowable radial offset
-############################################
 
-rho_0x = rho
-rho_0 = [0,0]
-
-w = np.linspace(0, np.sqrt(2) * rho, 100)
-
-Qoplist = []
-for we in w:
-    
-    F_op = TQ.F_total_manual_integration(rho_0x,rho_0[1], rho, n_0, n_s, w_0, we, z_R, P , target = "reflective", coordinate = 'x', grid_size = grid_size)['force_total']
-
-    Q_op = F_op  * c / ( n_0 * P )
-    
-    Qoplist.append(Q_op)
-    
-
-plt.plot(w/(np.sqrt(2) * rho), np.array(Qoplist), lw=2, c="c", label="w = sqrt(2)rho")
-
-#print ((rho_0x/rho)[np.argmin(abs(np.array(Qoplist)))]) #print the inflection point
-
-
-new_ticks1 = np.linspace(0, 2 , 5) # plot axis
-print(new_ticks1)
-plt.xticks(new_ticks1,fontsize=20)
-plt.yticks(np.linspace(-0.4, 0.1, 6),fontsize=20)
-
-plt.rc('xtick',labelsize=20)
-plt.rc('ytick',labelsize=20)
-ax = plt.gca()
-ax.spines['top'].set_color('none')
-ax.spines['right'].set_color('none')
-ax.xaxis.set_ticks_position('bottom')
-ax.yaxis.set_ticks_position('left')
-ax.spines['left'].set_position(('data', 0))
-ax.spines['bottom'].set_position(('data',0))
-
-plt.legend(loc=1,fontsize=16)
-
-plt.xlabel('rho_0x/rho',fontsize=20)
-plt.ylabel('Qx_op',fontsize=20)
-
-plt.title('rho = 30um, w0 = 0.85um',fontsize=20)
-plt.grid()
-plt.show()'''

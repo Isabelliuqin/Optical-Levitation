@@ -39,7 +39,7 @@ import time
 
 
 integration_method = 'manual'   # 'manual' or 'integrated'
-grid_size = 400
+grid_size = 100
 
 plt.close('all')
 
@@ -84,7 +84,7 @@ P = 12.03    #optimal power for stiffness matching and stable equilibrium
 
 '''
 ######################################
-#plot of Q_z vs rho_0x for various w
+#FIG 3.2b)  plot of Q_z vs rho_0x for various w
 ######################################
 
 rho_0 = [0,0]   #no offset
@@ -187,8 +187,8 @@ plt.title('rho = 30um, w0 = 0.85um',fontsize=20)
 plt.ylabel('Qz + Qw',fontsize=20)
 plt.grid()
 plt.show()
-
 '''
+
 '''
 #################################################
 #coupling ratio at optimal trapping postion
@@ -205,7 +205,7 @@ fluct_ratio = (Q_zmax - Qmin)/abs(Q_zmax)
 '''
 '''
 ################################################
-#Investigation of axial force change vs offsets
+#FIG 3.5 Investigation of axial force change vs offsets
 ################################################
 
 rho_0 = [0,0]   #no offset
@@ -264,12 +264,12 @@ plt.rc('ytick',labelsize=20)
 plt.grid()
 plt.show()
 
-
 '''
 
 
+
 #####################################
-#gradient of Qz vs rho_0x
+#FIG 3.9a) gradient of Qz vs rho_0x
 #####################################
 
 

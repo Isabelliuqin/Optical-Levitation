@@ -75,7 +75,7 @@ P = 12.03  #optimal power required to levitate at w0 = 0.85um
 
 '''
 #########################################
-#plot Qx vs rho_0x for various w
+#FIG 3.3b) plot Qx vs rho_0x for various w
 #########################################
 
 
@@ -175,7 +175,7 @@ plt.show()
 
 '''
 #####################################
-#gradient of Qx at (0,0) for various w
+#FIG 3.9b) 3.7a) gradient of Qx at (0,0) for various w
 #####################################
 
 rho_0 = [0 , 0]
@@ -186,14 +186,14 @@ resolution = 0.01 * 10 ** (-6)
 
 
 
-#w_0 = [1*10**(-6), 2* 10 ** (-6), 5* 10 ** (-6), 10* 10 ** (-6)]
+w_0 = [1*10**(-6), 2* 10 ** (-6), 5* 10 ** (-6), 10* 10 ** (-6)]
 
-w = np.linspace(0.5 * np.sqrt(2)*rho, 2 * np.sqrt(2)*rho, 1000)
+w = np.linspace(0.5 * np.sqrt(2)*rho, 2 * np.sqrt(2)*rho, 100)
 
-grad_Fx0 = FTAP.Fx_stiffness_vs_w_plots(rho_0x,rho_0[0], rho, n_0, n_s, w_0, w, z_R, P, resolution, target = "reflective", integration_method = integration_method, grid_size = grid_size)
+#grad_Fx0 = FTAP.Fx_stiffness_vs_w_plots(rho_0x,rho_0[0], rho, n_0, n_s, w_0, w, z_R, P, resolution, target = "reflective", integration_method = integration_method, grid_size = grid_size)
 
 
-'''
+
 z_R0 = np.pi * w_0[0]**2 / Lambda
 
 z_R1 = np.pi * w_0[1]**2 / Lambda
@@ -211,7 +211,7 @@ grad_Fx2 = FTAP.Fx_stiffness_vs_w_plots(rho_0x,rho_0[0], rho, n_0, n_s, w_0[2], 
 grad_Fx3 = FTAP.Fx_stiffness_vs_w_plots(rho_0x,rho_0[0], rho, n_0, n_s, w_0[3], w, z_R3, P, resolution, target = "reflective", integration_method = integration_method, grid_size = grid_size)
 
 
-'''
+
 
 plt.figure(13)
 plt.plot(w/(np.sqrt(2) * rho), -np.array(grad_Fx0) * 10 ** 4, lw=2, c="c", label="rho_0x = 0")
